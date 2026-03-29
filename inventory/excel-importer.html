@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Excel to SQL Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+        
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 5px solid #c62828;
+        }
+        
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 5px solid #2e7d32;
+        }
+        
+        .info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border-left: 5px solid #1565c0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .raw-data {
+            max-height: 300px;
+            overflow: auto;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 10px;
+        }
+        
+        .step {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .step h3 {
+            margin-top: 0;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Universal Excel to SQL Converter</h1>
+        <p>This tool will convert your Excel inventory data to SQL import statements for PostgreSQL.</p>
+        
+        <div class="step">
+            <h3>Step 1: Select Your Excel File</h3>
+            <div class="form-group">
+                <label for="excelFile">Select Excel File:</label>
+                <input type="file" id="excelFile" accept=".xlsx, .xls">
+            </div>
+        </div>
+        
+        <div id="step2" class="step hidden">
+            <h3>Step 2: Choose Sheet and Row Range</h3>
+            <div class="form-group">
+                <label for="sheetSelect">Select Sheet:</label>
+                <select id="sheetSelect"></select>
+            </div>
+            
+            <button id="showDataBtn">Show Raw Data</button>
+            <div id="rawDataContainer" class="raw-data hidden"></div>
+        </div>
+        
+        <div id="step3" class="step hidden">
+            <h3>Step 3: Map Columns</h3>
+            <p>Based on our analysis, here are the suggested column mappings. Please review and adjust if needed:</p>
+            
+            <div class="form-group">
+                <label for="nameCol">Product Name/Designation Column:</label>
+                <input type="text" id="nameCol" placeholder="e.g., C or 3">
+            </div>
+            
+            <div class="form-group">
+                <label for="categoryCol">Category Column:</label>
+                <input type="text" id="categoryCol" placeholder="e.g., D or 4">
+            </div>
+            
+            <div class="form-group">
+                <label for="referenceCol">Reference Number Column:</label>
+                <input type="text" id="referenceCol" placeholder="e.g., F or 6">
+            </div>
+            
+            <div class="form-group">
+                <label for="supplierCol">Supplier Column:</label>
+                <input type="text" id="supplierCol" placeholder="e.g., E or 5">
+            </div>
+            
+            <div class="form-group">
+                <label for="unitTypeCol">Unit Type Column:</label>
+                <input type="text" id="unitTypeCol" placeholder="e.g., G or 7">
+            </div>
+            
+            <div class="form-group">
+                <label for="qtyPerUnitCol">Quantity Per Unit Column:</label>
+                <input type="text" id="qtyPerUnitCol" placeholder="e.g., H or 8">
+            </div>
+            
+            <div class="form-group">
+                <label for="stockCol">Stock Column:</label>
+                <input type="text" id="stockCol" placeholder="e.g., L or 12">
+            </div>
+            
+            <div class="form-group">
+                <label for="startRow">First Data Row (1-based):</label>
+                <input type="number" id="startRow" value="2" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="endRow">Last Data Row (leave empty to process all rows):</label>
+                <input type="number" id="endRow" placeholder="Optional">
+            </div>
+            
+            <div class="form-group">
+                <label for="defaultLocation">Default Storage Location:</label>
+                <input type="text" id="defaultLocation" value="Main Storage">
+            </div>
+            
+            <button id="processBtn">Process Data</button>
+        </div>
+        
+        <div id="step4" class="step hidden">
+            <h3>Step 4: Data Preview</h3>
+            <p>Below is a preview of the data that will be imported:</p>
+            
+            <div id="loader" class="loader hidden"></div>
+            <div id="dataPreview"></div>
+            
+            <button id="generateSqlBtn">Generate SQL</button>
+        </div>
+        
+        <div id="step5" class="step hidden">
+            <h3>Step 5: SQL Output</h3>
+            <p>The SQL statements have been generated. You can review them below or download the file.</p>
+            
+            <button id="downloadSqlBtn">Download SQL File</button>
+            
+            <div id="sqlOutput"></div>
+        </div>
+        
+        <div id="messageArea"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // DOM Elements
+        const excelFileInput = document.getElementById('excelFile');
+        const sheetSelect = document.getElementById('sheetSelect');
+        const showDataBtn = document.getElementById('showDataBtn');
+        const rawDataContainer = document.getElementById('rawDataContainer');
+        const nameColInput = document.getElementById('nameCol');
+        const categoryColInput = document.getElementById('categoryCol');
+        const referenceColInput = document.getElementById('referenceCol');
+        const supplierColInput = document.getElementById('supplierCol');
+        const unitTypeColInput = document.getElementById('unitTypeCol');
+        const qtyPerUnitColInput = document.getElementById('qtyPerUnitCol');
+        const stockColInput = document.getElementById('stockCol');
+        const startRowInput = document.getElementById('startRow');
+        const endRowInput = document.getElementById('endRow');
+        const defaultLocationInput = document.getElementById('defaultLocation');
+        const processBtn = document.getElementById('processBtn');
+        const dataPreview = document.getElementById('dataPreview');
+        const generateSqlBtn = document.getElementById('generateSqlBtn');
+        const downloadSqlBtn = document.getElementById('downloadSqlBtn');
+        const sqlOutput = document.getElementById('sqlOutput');
+        const messageArea = document.getElementById('messageArea');
+        const loader = document.getElementById('loader');
+        
+        // Step containers
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const step5 = document.getElementById('step5');
+        
+        // Global variables
+        let workbook = null;
+        let processedData = [];
+        let generatedSql = '';
+        
+        // Function to convert between column letter and index
+        function convertColumnToIndex(col) {
+            if (!col) return -1;
+            
+            // If it's a number, return as is
+            if (/^\d+$/.test(col)) {
+                return parseInt(col) - 1; // Convert to 0-based
+            }
+            
+            // If it's a letter, convert to index
+            col = col.toUpperCase();
+            let result = 0;
+            for (let i = 0; i < col.length; i++) {
+                result = result * 26 + (col.charCodeAt(i) - 64);
+            }
+            return result - 1; // Convert to 0-based
+        }
+        
+        function convertIndexToColumn(index) {
+            if (index < 0) return '';
+            
+            let column = '';
+            index++;
+            while (index > 0) {
+                const remainder = (index - 1) % 26;
+                column = String.fromCharCode(65 + remainder) + column;
+                index = Math.floor((index - 1) / 26);
+            }
+            return column;
+        }
+        
+        // Handle file selection
+        excelFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            showMessage('Loading Excel file...', 'info');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Populate sheet select
+                    sheetSelect.innerHTML = '';
+                    workbook.SheetNames.forEach(sheetName => {
+                        const option = document.createElement('option');
+                        option.value = sheetName;
+                        option.textContent = sheetName;
+                        sheetSelect.appendChild(option);
+                    });
+                    
+                    // Show step 2
+                    step2.classList.remove('hidden');
+                    showMessage('Excel file loaded successfully. Please select a sheet.', 'success');
+                    
+                } catch (error) {
+                    showMessage('Error loading Excel file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+        
+        // Show raw data
+        showDataBtn.addEventListener('click', function() {
+            if (!workbook) {
+                showMessage('Please select an Excel file first', 'error');
+                return;
+            }
+            
+            const sheetName = sheetSelect.value;
+            if (!sheetName) {
+                showMessage('Please select a sheet', 'error');
+                return;
+            }
+            
+            // Get the first 100 rows of the sheet
+            const worksheet = workbook.Sheets[sheetName];
+            const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+            
+            // Show in the raw data container
+            let html = '<h4>Raw Excel Data (First 20 rows)</h4>';
+            html += '<table>';
+            
+            // Add column headers
+            html += '<tr>';
+            for (let i = 0; i < 15; i++) {
+                html += `<th>${convertIndexToColumn(i)}</th>`;
+            }
+            html += '</tr>';
+            
+            // Add rows
+            const rowsToShow = Math.min(data.length, 20);
+            for (let i = 0; i < rowsToShow; i++) {
+                html += '<tr>';
+                const row = data[i] || [];
+                for (let j = 0; j < 15; j++) {
+                    html += `<td>${row[j] !== undefined ? escapeHtml(row[j]) : ''}</td>`;
+                }
+                html += '</tr>';
+            }
+            
+            html += '</table>';
+            html += `<p>Note: This is showing the first 20 rows only. The full sheet has ${data.length} rows.</p>`;
+            
+            rawDataContainer.innerHTML = html;
+            rawDataContainer.classList.remove('hidden');
+            
+            // Try to guess column mappings
+            tryGuessColumns(data);
+            
+            // Show step 3
+            step3.classList.remove('hidden');
+        });
+        
+        // Try to guess column mappings based on headers
+        function tryGuessColumns(data) {
+            // Look for headers in the first 5 rows
+            for (let i = 0; i < Math.min(data.length, 5); i++) {
+                const row = data[i];
+                if (!row) continue;
+                
+                for (let j = 0; j < row.length; j++) {
+                    const cell = String(row[j]).toLowerCase();
+                    
+                    // Check for column names
+                    if (cell.includes('design') || cell.includes('nom') || cell.includes('article')) {
+                        nameColInput.value = convertIndexToColumn(j);
+                    }
+                    else if (cell.includes('categ') || cell.includes('type')) {
+                        categoryColInput.value = convertIndexToColumn(j);
+                    }
+                    else if (cell.includes('ref') || cell.includes('code')) {
+                        referenceColInput.value = convertIndexToColumn(j);
+                    }
+                    else if (cell.includes('fourni') || cell.includes('vendor')) {
+                        supplierColInput.value = convertIndexToColumn(j);
+                    }
+                    else if (cell.includes('unit') && !cell.includes('quant')) {
+                        unitTypeColInput.value = convertIndexToColumn(j);
+                    }
+                    else if (cell.includes('quant') || (cell.includes('unit') && cell.includes('dans'))) {
+                        qtyPerUnitColInput.value = convertIndexToColumn(j);
+                    }
+                    else if (cell.includes('stock') || cell.includes('final')) {
+                        stockColInput.value = convertIndexToColumn(j);
+                    }
+                }
+            }
+            
+            // If we couldn't guess, set defaults based on the image provided
+            if (!nameColInput.value) nameColInput.value = 'C';
+            if (!categoryColInput.value) categoryColInput.value = 'D';
+            if (!referenceColInput.value) referenceColInput.value = 'F';
+            if (!supplierColInput.value) supplierColInput.value = 'E';
+            if (!unitTypeColInput.value) unitTypeColInput.value = 'G';
+            if (!qtyPerUnitColInput.value) qtyPerUnitColInput.value = 'H';
+            if (!stockColInput.value) stockColInput.value = 'L';
+            
+            // Set start row - default to 2
+            startRowInput.value = '2';
+        }
+        
+        // Process data
+        processBtn.addEventListener('click', function() {
+            if (!workbook) {
+                showMessage('Please select an Excel file first', 'error');
+                return;
+            }
+            
+            const sheetName = sheetSelect.value;
+            if (!sheetName) {
+                showMessage('Please select a sheet', 'error');
+                return;
+            }
+            
+            // Get column mappings
+            const nameCol = convertColumnToIndex(nameColInput.value);
+            const categoryCol = convertColumnToIndex(categoryColInput.value);
+            const referenceCol = convertColumnToIndex(referenceColInput.value);
+            const supplierCol = convertColumnToIndex(supplierColInput.value);
+            const unitTypeCol = convertColumnToIndex(unitTypeColInput.value);
+            const qtyPerUnitCol = convertColumnToIndex(qtyPerUnitColInput.value);
+            const stockCol = convertColumnToIndex(stockColInput.value);
+            
+            // Check if we have valid column mappings
+            if (nameCol < 0) {
+                showMessage('Please provide a valid Product Name column', 'error');
+                return;
+            }
+            
+            // Get row range
+            const startRow = parseInt(startRowInput.value) - 1; // Convert to 0-based
+            const endRow = endRowInput.value ? parseInt(endRowInput.value) - 1 : undefined;
+            
+            try {
+                // Show loader
+                loader.classList.remove('hidden');
+                
+                // Get worksheet and convert to array
+                const worksheet = workbook.Sheets[sheetName];
+                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                
+                // Process the data
+                processedData = [];
+                
+                for (let i = startRow; i < data.length; i++) {
+                    if (endRow !== undefined && i > endRow) break;
+                    
+                    const row = data[i];
+                    if (!row) continue;
+                    
+                    // Skip rows without a name
+                    const name = row[nameCol];
+                    if (!name) continue;
+                    
+                    // Get category and determine piece type
+                    const category = row[categoryCol] || '';
+                    let pieceType = 'SPARE_PART'; // Default
+                    
+                    if (typeof category === 'string') {
+                        const catLower = category.toLowerCase();
+                        if (catLower.includes('consommable')) pieceType = 'CONSUMABLE';
+                        else if (catLower.includes('outillage')) pieceType = 'TOOL';
+                        else if (catLower.includes('appareil')) pieceType = 'NON_CONSUMABLE';
+                        else if (catLower.includes('orth')) pieceType = 'SPARE_PART';
+                    }
+                    
+                    // Add to processed data
+                    processedData.push({
+                        name: name,
+                        category: row[categoryCol] || '',
+                        supplier: row[supplierCol] || '',
+                        reference: row[referenceCol] || '',
+                        unitType: row[unitTypeCol] || 'Unité',
+                        quantityPerUnit: parseFloat(row[qtyPerUnitCol]) || 1,
+                        stock: parseFloat(row[stockCol]) || 0,
+                        pieceType: pieceType
+                    });
+                }
+                
+                // Hide loader
+                loader.classList.add('hidden');
+                
+                if (processedData.length === 0) {
+                    showMessage('No valid data found. Please check your column mappings and row range.', 'error');
+                    return;
+                }
+                
+                // Generate data preview
+                generateDataPreview();
+                
+                // Show step 4
+                step4.classList.remove('hidden');
+                showMessage(`Successfully processed ${processedData.length} rows. Please review the data preview.`, 'success');
+                
+            } catch (error) {
+                loader.classList.add('hidden');
+                showMessage('Error processing data: ' + error.message, 'error');
+            }
+        });
+        
+        // Generate data preview
+        function generateDataPreview() {
+            let html = `<h4>Data Preview (${processedData.length} rows)</h4>`;
+            html += '<table>';
+            html += '<tr><th>Name</th><th>Category</th><th>Reference</th><th>Supplier</th><th>Unit Type</th><th>Qty/Unit</th><th>Stock</th><th>Piece Type</th></tr>';
+            
+            // Show at most 50 rows
+            const previewData = processedData.slice(0, 50);
+            
+            previewData.forEach(row => {
+                html += `<tr>
+                    <td>${escapeHtml(row.name)}</td>
+                    <td>${escapeHtml(row.category)}</td>
+                    <td>${escapeHtml(row.reference)}</td>
+                    <td>${escapeHtml(row.supplier)}</td>
+                    <td>${escapeHtml(row.unitType)}</td>
+                    <td>${row.quantityPerUnit}</td>
+                    <td>${row.stock}</td>
+                    <td>${row.pieceType}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            
+            if (processedData.length > 50) {
+                html += `<p><i>Showing 50 of ${processedData.length} rows. All rows will be included in the SQL.</i></p>`;
+            }
+            
+            dataPreview.innerHTML = html;
+        }
+        
+        // Generate SQL
+       // Generate SQL
+generateSqlBtn.addEventListener('click', function() {
+    if (processedData.length === 0) {
+        showMessage('No data to generate SQL from', 'error');
+        return;
+    }
+    
+    try {
+        // Show loader
+        loader.classList.remove('hidden');
+        
+        const location = defaultLocationInput.value || 'Main Storage';
+        
+        // Start SQL
+        let sql = `-- Generated SQL for pieces table
+-- Generated on: ${new Date().toLocaleString()}
+-- Total rows: ${processedData.length}
+
+BEGIN;
+
+-- Importing pieces data
+INSERT INTO pieces (
+  name,
+  reference,
+  category,
+  subcategory,
+  current_stock,
+  initial_stock,
+  piece_type,
+  location,
+  unit_type,
+  quantity_per_unit,
+  supplier,
+  created_at,
+  updated_at
+) VALUES\n`;
+        
+        // Track duplicates
+        const refs = {};
+        
+        // Generate values
+        const values = processedData.map((row, index) => {
+            // Handle duplicate references
+            let ref = row.reference ? String(row.reference) : '';
+            if (ref) {
+                ref = ref.trim();
+                if (refs[ref] === undefined) {
+                    refs[ref] = 0;
+                } else {
+                    refs[ref]++;
+                    ref = `${ref}-${refs[ref]}`;
+                }
+            }
+            
+            return `(
+  '${sqlEscape(row.name)}',
+  ${ref ? `'${sqlEscape(ref)}'` : 'NULL'},
+  '${sqlEscape(row.category)}',
+  '${sqlEscape(row.category)}',
+  ${row.stock || 0},
+  ${row.stock || 0},
+  '${row.pieceType}',
+  '${sqlEscape(location)}',
+  '${sqlEscape(row.unitType || 'Unité')}',
+  ${row.quantityPerUnit || 1},
+  ${row.supplier ? `'${sqlEscape(String(row.supplier))}'` : 'NULL'},
+  NOW(),
+  NOW()
+)${index < processedData.length - 1 ? ',' : ';'}`;
+        });
+        
+        sql += values.join('\n');
+        sql += '\n\nCOMMIT;';
+        
+        // Set the generated SQL
+        generatedSql = sql;
+        sqlOutput.textContent = sql;
+        
+        // Hide loader
+        loader.classList.add('hidden');
+        
+        // Show step 5
+        step5.classList.remove('hidden');
+        showMessage(`SQL generated for ${processedData.length} rows. You can now download the SQL file.`, 'success');
+        
+    } catch (error) {
+        loader.classList.add('hidden');
+        showMessage('Error generating SQL: ' + error.message, 'error');
+    }
+});
+        
+        // Download SQL
+        downloadSqlBtn.addEventListener('click', function() {
+            if (!generatedSql) {
+                showMessage('Please generate SQL first', 'error');
+                return;
+            }
+            
+            const blob = new Blob([generatedSql], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pieces_import.sql';
+            a.click();
+            
+            URL.revokeObjectURL(url);
+        });
+        
+        // Helper function to escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        
+        // Helper function to escape SQL strings
+        function sqlEscape(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "''");
+        }
+        
+        // Helper function to show messages
+        function showMessage(message, type) {
+            messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>

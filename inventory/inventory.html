@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management - OrthoProConnect</title>
+    <link rel="stylesheet" href="inventory.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-element bg-element-1"></div>
+        <div class="bg-element bg-element-2"></div>
+        <div class="bg-element bg-element-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="brand-section">
+                <h1 class="page-title">
+                    <i class="fas fa-boxes"></i>
+                    Inventory Management
+                </h1>
+                <p class="page-subtitle">Manage your equipment and stock</p>
+            </div>
+            <div class="header-actions">
+                <button class="notification-btn" id="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notification-badge">0</span>
+                </button>
+                <button class="back-btn" id="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Controls Section -->
+        <section class="controls-section">
+            <div class="search-controls">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search inventory..." class="search-input">
+                </div>
+                <select id="category-filter" class="filter-select">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="stock-filter" class="filter-select">
+                    <option value="">All Stock Levels</option>
+                    <option value="low">Low Stock</option>
+                    <option value="critical">Critical Stock</option>
+                    <option value="out">Out of Stock</option>
+                </select>
+                <button id="search-btn" class="search-btn">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div>
+            
+            <div class="action-controls">
+                <button id="add-piece-btn" class="action-btn primary">
+                    <i class="fas fa-plus"></i>
+                    Add Piece
+                </button>
+                <button id="add-student-btn" class="action-btn secondary">
+                    <i class="fas fa-user-plus"></i>
+                    Add Student
+                </button>
+                <div class="export-controls">
+                    <select id="month-selector" class="month-select">
+                        <option value="">Select Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <button id="export-month-btn" class="action-btn export">
+                        <i class="fas fa-file-pdf"></i>
+                        Export Stock
+                    </button>
+                    <button id="export-adjustments-btn" class="action-btn export">
+                        <i class="fas fa-history"></i>
+                        Export History
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventory Table -->
+        <section class="table-section">
+            <div class="table-container">
+                <table id="inventory-table" class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Supplier</th>
+                            <th>Reference</th>
+                            <th>Initial Stock</th>
+                            <th>Entries</th>
+                            <th>Exits</th>
+                            <th>Current Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table content will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notification-panel">
+        <div class="notification-panel-header">
+            <h3><i class="fas fa-bell"></i> Stock Alerts</h3>
+            <button class="close-btn" id="close-notifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-panel-content" id="notification-panel-content">
+            <!-- Notifications will be populated here -->
+        </div>
+    </div>
+
+    <!-- Item Details Modal -->
+    <div class="modal" id="item-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-item-name">Item Details</h2>
+                <button class="close-btn" id="close-item-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="item-details-grid">
+                    <!-- Item Basic Info -->
+                    <div class="item-basic-info">
+                        <div class="item-image-container">
+                            <img id="modal-item-image" src="" alt="Item image" class="item-image">
+                            <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+                            <button class="upload-btn" id="upload-image-btn" title="Upload Image">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <div class="loading-overlay" id="image-loading-overlay" style="display: none;">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="item-info">
+                            <div class="info-item">
+                                <span class="info-label">Category:</span>
+                                <span id="modal-item-category" class="info-value">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Type:</span>
+                                <span id="modal-item-type" class="info-value">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Current Stock:</span>
+                                <span id="modal-item-stock" class="info-value">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Location:</span>
+                                <span id="modal-item-location" class="info-value">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Reference:</span>
+                                <span id="modal-item-reference" class="info-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Statistics -->
+                    <div class="usage-stats">
+                        <h3>Usage Statistics</h3>
+                        <div class="stats-tabs">
+                            <button class="tab-btn active" data-tab="monthly">Monthly</button>
+                            <button class="tab-btn" data-tab="daily">Daily</button>
+                        </div>
+                        <div class="tab-content" id="monthly-tab">
+                            <div id="monthly-transactions" class="monthly-transactions">
+                                <!-- Monthly data will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="tab-content" id="daily-tab" style="display: none;">
+                            <div id="daily-transactions" class="daily-transactions">
+                                <div class="instructions">Select a month and day to view transactions</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Thresholds -->
+                    <div class="stock-thresholds">
+                        <h3>Stock Thresholds</h3>
+                        <div class="threshold-form">
+                            <div class="form-group">
+                                <label for="min-threshold">Minimum Threshold:</label>
+                                <input type="number" id="min-threshold" min="0" class="threshold-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="max-threshold">Maximum Threshold:</label>
+                                <input type="number" id="max-threshold" min="0" class="threshold-input">
+                            </div>
+                            <button id="save-thresholds-btn" class="save-btn">
+                                <i class="fas fa-save"></i>
+                                Save Thresholds
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Piece Modal -->
+    <div class="modal" id="add-piece-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Piece</h2>
+                <button class="close-btn" id="close-piece-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-piece-form" class="form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="piece-name">Name*</label>
+                            <input type="text" id="piece-name" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-reference">Reference</label>
+                            <input type="text" id="piece-reference" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-category">Category*</label>
+                            <select id="piece-category" required class="form-input">
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-subcategory">Subcategory*</label>
+                            <input type="text" id="piece-subcategory" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-type">Type*</label>
+                            <select id="piece-type" required class="form-input">
+                                <option value="">Select Type</option>
+                                <option value="CONSUMABLE">Consumable</option>
+                                <option value="NON_CONSUMABLE">Non Consumable</option>
+                                <option value="TOOL">Tool</option>
+                                <option value="SPARE_PART">Spare Part</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-supplier">Supplier</label>
+                            <input type="text" id="piece-supplier" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-initial-stock">Initial Stock*</label>
+                            <input type="number" id="piece-initial-stock" min="0" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="piece-location">Location*</label>
+                            <input type="text" id="piece-location" required class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="piece-notes">Notes</label>
+                        <textarea id="piece-notes" rows="3" class="form-input"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-plus"></i>
+                            Add Piece
+                        </button>
+                        <button type="button" class="cancel-btn" id="cancel-piece-btn">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal" id="add-student-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Student</h2>
+                <button class="close-btn" id="close-student-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-student-form" class="form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="student-fullname">Full Name*</label>
+                            <input type="text" id="student-fullname" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-code">Student Code*</label>
+                            <input type="text" id="student-code" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-email">Email</label>
+                            <input type="email" id="student-email" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-class">Class</label>
+                            <input type="text" id="student-class" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-academic-year">Academic Year</label>
+                            <input type="text" id="student-academic-year" placeholder="e.g., 2024-2025" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Add Student
+                        </button>
+                        <button type="button" class="cancel-btn" id="cancel-student-btn">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div class="qr-modal" id="qr-modal">
+        <div class="qr-modal-content">
+            <div class="qr-modal-header">
+                <h2 class="qr-modal-title">Scan QR Code</h2>
+                <button class="close-modal-btn" id="close-qr-modal">&times;</button>
+            </div>
+            <div class="qr-scanner-container">
+                <div class="scanner-placeholder" id="scanner-placeholder"></div>
+                <div class="scanner-overlay">
+                    <div class="scanner-frame"></div>
+                </div>
+            </div>
+            <div class="scanner-instructions">
+                <p>Position the QR code within the frame</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay global-loading" id="global-loading" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner large"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="../config/api-config.js"></script>
+    <script src="../config/app-config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="inventory.js"></script>
+</body>
+</html>
