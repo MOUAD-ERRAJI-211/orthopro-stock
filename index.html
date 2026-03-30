@@ -1,1 +1,149 @@
-<meta http-equiv="refresh" content="0; url=dashboard/dashboard.html">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthoStock | Gestion du stock orthoprothétique</title>
+  <link rel="stylesheet" href="assets/css/design-system.css">
+  <link rel="stylesheet" href="assets/css/landing.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <div class="bg-mesh">
+    <div class="mesh-blob mb-1"></div>
+    <div class="mesh-blob mb-2"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fas fa-boxes"></i>
+        </div>
+        <div>
+          <div class="brand-name">Ortho<strong>Stock</strong></div>
+          <div class="brand-sub">Gestion des stocks orthoprothétiques</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="status-pill"><i class="fas fa-circle"></i> Système actif</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main class="landing-main">
+    <section class="landing-hero">
+      <div class="lh-content">
+        <div class="lh-label"><i class="fas fa-boxes"></i> Système de gestion de stock</div>
+        <h1>Gérez votre stock <span class="hl">intelligemment</span></h1>
+        <p>Plateforme complète pour la gestion des pièces orthoprothétiques. Suivi des emprunts, retours, inventaire et historique en temps réel.</p>
+        <div class="lh-stats">
+          <div class="lh-stat"><i class="fas fa-box-open"></i><span>Inventaire en temps réel</span></div>
+          <div class="lh-stat"><i class="fas fa-qrcode"></i><span>Scan QR Code</span></div>
+          <div class="lh-stat"><i class="fas fa-history"></i><span>Historique complet</span></div>
+        </div>
+      </div>
+      <div class="lh-visual">
+        <div class="lh-card main-lhc">
+          <div class="lhc-header">
+            <div class="lhc-icon"><i class="fas fa-chart-pie"></i></div>
+            <span>Vue d'ensemble du stock</span>
+          </div>
+          <div class="lhc-bars">
+            <div class="lhc-bar-row"><span>Disponible</span><div class="lhc-bar"><div class="lhc-fill" style="width:78%; background: #22c55e;"></div></div><span>78%</span></div>
+            <div class="lhc-bar-row"><span>Emprunté</span><div class="lhc-bar"><div class="lhc-fill" style="width:18%; background: #f59e0b;"></div></div><span>18%</span></div>
+            <div class="lhc-bar-row"><span>Stock bas</span><div class="lhc-bar"><div class="lhc-fill" style="width:4%; background: #ef4444;"></div></div><span>4%</span></div>
+          </div>
+        </div>
+        <div class="lh-mini-cards">
+          <div class="mini-card"><i class="fas fa-hand-holding"></i><span>Emprunts</span></div>
+          <div class="mini-card"><i class="fas fa-undo-alt"></i><span>Retours</span></div>
+          <div class="mini-card"><i class="fas fa-warehouse"></i><span>Stock</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Cards -->
+    <section class="nav-section">
+      <h2>Accès rapide</h2>
+      <div class="nav-grid">
+        <a href="dashboard/dashboard.html" class="nav-card">
+          <div class="nc-icon" style="background: rgba(14,124,140,0.1); color: #0e7c8c;">
+            <i class="fas fa-tachometer-alt"></i>
+          </div>
+          <div class="nc-body">
+            <h3>Tableau de bord</h3>
+            <p>Vue d'ensemble, statistiques et alertes de stock en temps réel</p>
+          </div>
+          <i class="fas fa-chevron-right nc-arrow"></i>
+        </a>
+
+        <a href="authentication/auth.html?redirect=borrowing" class="nav-card">
+          <div class="nc-icon" style="background: rgba(34,197,94,0.1); color: #16a34a;">
+            <i class="fas fa-hand-holding"></i>
+          </div>
+          <div class="nc-body">
+            <h3>Emprunt de matériel</h3>
+            <p>Scanner le QR code étudiant pour effectuer un emprunt</p>
+          </div>
+          <i class="fas fa-chevron-right nc-arrow"></i>
+        </a>
+
+        <a href="authentication/auth.html?redirect=returning" class="nav-card">
+          <div class="nc-icon" style="background: rgba(245,158,11,0.1); color: #d97706;">
+            <i class="fas fa-undo-alt"></i>
+          </div>
+          <div class="nc-body">
+            <h3>Retour de matériel</h3>
+            <p>Gérer le retour des pièces empruntées par les étudiants</p>
+          </div>
+          <i class="fas fa-chevron-right nc-arrow"></i>
+        </a>
+
+        <a href="inventory/inventory.html" class="nav-card">
+          <div class="nc-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
+            <i class="fas fa-warehouse"></i>
+          </div>
+          <div class="nc-body">
+            <h3>Inventaire</h3>
+            <p>Consulter et gérer le catalogue complet des pièces disponibles</p>
+          </div>
+          <i class="fas fa-chevron-right nc-arrow"></i>
+        </a>
+
+        <a href="history/history.html" class="nav-card">
+          <div class="nc-icon" style="background: rgba(139,92,246,0.1); color: #7c3aed;">
+            <i class="fas fa-history"></i>
+          </div>
+          <div class="nc-body">
+            <h3>Historique</h3>
+            <p>Consulter l'historique complet des transactions et mouvements</p>
+          </div>
+          <i class="fas fa-chevron-right nc-arrow"></i>
+        </a>
+
+        <a href="authentication/auth.html" class="nav-card">
+          <div class="nc-icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+            <i class="fas fa-qrcode"></i>
+          </div>
+          <div class="nc-body">
+            <h3>Authentification QR</h3>
+            <p>Scanner le QR code d'un étudiant pour accéder au système</p>
+          </div>
+          <i class="fas fa-chevron-right nc-arrow"></i>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>&copy; 2025 OrthoStock — Système de gestion orthoprothétique</p>
+    <a href="../webapp/index.html" class="footer-back"><i class="fas fa-arrow-left"></i> Retour à OrthoPro+</a>
+  </footer>
+
+</body>
+</html>
