@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    BASE_URL: 'https://mouad-erraji-211-orthopro-api.hf.space',
+    BASE_URL: 'https://web-production-47eca.up.railway.app',
     ENDPOINTS: {
         AUTH: '/api/students/validate-qr',
         STUDENTS: '/api/students', STUDENT_BY_CODE: '/api/students/code',
@@ -25,3 +25,4 @@ const API_CONFIG = {
     },
     DEFAULT_HEADERS: { 'Content-Type': 'application/json' }
 };
+
