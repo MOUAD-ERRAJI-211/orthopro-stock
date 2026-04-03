@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Complete API Service for OrthoProConnect
  * Handles all interactions with the backend API
  */
@@ -237,7 +237,7 @@ class ApiService {
             }
 
             const cleanQrCode = qrCode.trim();
-            const url = `${this.baseUrl}${API_CONFIG.ENDPOINTS.PIECE_BY_QR_CODE}/${encodeURIComponent(cleanQrCode)}`;
+            const url = `${this.baseUrl}${API_CONFIG.ENDPOINTS.PIECE_BY_QR_CODE}?qrCode=${encodeURIComponent(cleanQrCode)}`;
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -975,3 +975,4 @@ setTimeout(() => {
         console.log('API connection test result:', result ? 'Success' : 'Failed');
     });
 }, 1000);
+
