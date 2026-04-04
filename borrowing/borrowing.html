@@ -1,160 +1,320 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrow Equipment - OrthoProConnect</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <link rel="stylesheet" href="../assets/css/design-system.css">
-  <link rel="stylesheet" href="borrowing.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthoStock | Emprunt de matériel</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background: var(--bg); min-height: 100vh; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.9rem;
+    }
+    .brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: white; }
+    .brand-name strong { color: var(--primary-light); }
+    .back-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.9rem; border-radius: var(--radius);
+      border: 1.5px solid rgba(255,255,255,0.2); background: none;
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      text-decoration: none; transition: var(--transition); cursor: pointer;
+      font-family: var(--font-body);
+    }
+    .back-link:hover { border-color: rgba(255,255,255,0.5); color: white; }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-display); font-size: 1.8rem; color: var(--text); margin-bottom: 0.3rem; }
+    .page-header h1 span { color: var(--primary); }
+    .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Scan bar */
+    .scan-bar {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .scan-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 1.5rem; border-radius: var(--radius-md);
+      border: 2px dashed var(--primary); background: var(--primary-glow);
+      color: var(--primary); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+      white-space: nowrap;
+    }
+    .scan-btn:hover { background: var(--primary); color: white; }
+
+    .or-divider {
+      display: flex; align-items: center; gap: 0.5rem;
+      color: var(--text-light); font-size: 0.78rem; font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .manual-input-wrap { display: flex; gap: 0.5rem; flex: 1; min-width: 200px; }
+    .manual-input, #qr-input {
+      flex: 1; padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-body); font-size: 0.9rem; color: var(--text);
+      outline: none; transition: var(--transition);
+    }
+    .manual-input:focus, #qr-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .submit-btn, #submit-btn {
+      padding: 0.7rem 1.25rem; border-radius: var(--radius);
+      background: var(--primary); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); white-space: nowrap;
+    }
+    .submit-btn:hover, #submit-btn:hover { background: var(--primary-light); }
+
+    /* Selected item */
+    .selected-item-section, #selected-item-section {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--primary); border-left: 4px solid var(--primary);
+      padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: none;
+    }
+    .selected-item-section.show, #selected-item-section.show { display: block; }
+    .selected-item-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+    }
+    .selected-item-title {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.95rem; font-weight: 600; color: var(--primary);
+    }
+    .clear-selection-btn, #clear-selection-btn {
+      padding: 0.35rem 0.8rem; border-radius: var(--radius);
+      border: 1.5px solid var(--border); background: none;
+      font-size: 0.8rem; color: var(--text-muted); cursor: pointer;
+      transition: var(--transition); font-family: var(--font-body);
+    }
+    .clear-selection-btn:hover, #clear-selection-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Items grid */
+    .items-section { }
+    .items-section-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;
+    }
+    .items-section-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+    .items-section-header p { font-size: 0.85rem; color: var(--text-muted); }
+
+    .items-grid, #items-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Loading */
+    .loading-state { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 3rem; color: var(--text-muted); }
+    .loading-spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* QR Modal */
+    .qr-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,35,0.7); backdrop-filter: blur(6px);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .qr-modal.active { display: flex; }
+    .qr-modal-content {
+      width: 100%; max-width: 420px;
+      background: var(--surface); border-radius: var(--radius-lg);
+      overflow: hidden; box-shadow: var(--shadow-lg);
+    }
+    .qr-modal-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .qr-modal-title { color: white; font-size: 1rem; font-weight: 600; }
+    .close-modal-btn {
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .close-modal-btn:hover { background: rgba(255,255,255,0.3); }
+    .qr-scanner-container { padding: 1.5rem; position: relative; }
+    .scanner-placeholder { width: 100%; height: 280px; background: #1a2535; border-radius: var(--radius-md); }
+    .scanner-overlay { position: absolute; inset: 1.5rem; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+    .scanner-frame { width: 180px; height: 180px; border: 2px solid var(--primary); border-radius: 12px; }
+    .scanner-instructions { padding: 0 1.5rem 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Borrow Modal */
+    .borrow-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,35,0.7); backdrop-filter: blur(6px);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .borrow-modal.active { display: flex; }
+    .borrow-modal-content {
+      width: 100%; max-width: 500px;
+      background: var(--surface); border-radius: var(--radius-lg);
+      overflow: hidden; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;
+    }
+    .borrow-modal-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0;
+    }
+    .borrow-modal-title { color: white; font-size: 1rem; font-weight: 600; }
+    .borrow-modal-body { padding: 1.5rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-label {
+      display: block; font-size: 0.8rem; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 0.4rem;
+    }
+    .form-input, .form-textarea {
+      width: 100%; padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-body); font-size: 0.9rem; color: var(--text);
+      outline: none; transition: var(--transition); background: var(--surface);
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+
+    .confirm-borrow-btn {
+      width: 100%; padding: 0.85rem; border-radius: var(--radius-md);
+      background: var(--primary); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); margin-top: 0.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .confirm-borrow-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+    @media (max-width: 640px) {
+      .scan-bar { flex-direction: column; }
+      .page { padding: 1rem; }
+    }
+  </style>
 </head>
-
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <h1 class="page-title">
-                <svg class="title-icon" viewBox="0 0 24 24">
-                    <path
-                        d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z" />
-                </svg>
-                Borrow Equipment
-            </h1>
-            <button class="back-btn" id="back-btn">
-                <svg class="back-icon" viewBox="0 0 24 24">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                </svg>
-                Back to Dashboard
-            </button>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Action Bar -->
-        <div class="action-bar">
-            <div class="scan-section">
-                <button class="scan-btn" id="scan-btn">
-                    <svg class="scan-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v4h-4v2h6v-6zm-2-8h2v2h-2V5zM7 7h2v2H7V7zm12 12v2h-2v-2h2zm-6 0h2v2h-2v-2zm-6 0h2v2H7v-2zm-2-2h2v2H5v-2z" />
-                    </svg>
-                    Scan QR Code
-                </button>
-                <p class="scan-instruction">Scan the QR code on equipment to borrow it quickly</p>
-            </div>
+  <nav class="navbar">
+    <a href="../dashboard/dashboard.html" class="brand">
+      <div class="brand-icon"><i class="fas fa-boxes"></i></div>
+      <span class="brand-name">Ortho<strong>Stock</strong></span>
+    </a>
+    <button class="back-link" id="back-btn">
+      <i class="fas fa-arrow-left"></i> Tableau de bord
+    </button>
+  </nav>
 
-            <div class="divider">OR</div>
-
-            <div class="manual-input-section">
-                <input type="text" class="manual-input" id="qr-input" placeholder="Enter QR code manually...">
-                <button class="submit-btn" id="submit-btn">Submit</button>
-            </div>
-        </div>
-
-        <!-- Selected Item Section -->
-        <div class="selected-item-section" id="selected-item-section">
-            <div class="selected-item-header">
-                <h2 class="selected-item-title">
-                    <i class="material-icons">check_circle</i>
-                    Selected Item
-                </h2>
-                <button class="clear-selection-btn" id="clear-selection-btn">Clear Selection</button>
-            </div>
-            <div id="selected-item-content"></div>
-        </div>
-
-        <!-- Items Section -->
-        <div class="items-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <svg style="width: 24px; height: 24px; fill: currentColor;" viewBox="0 0 24 24">
-                        <path
-                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                    </svg>
-                    Available Equipment
-                </h2>
-                <p class="section-subtitle" id="items-subtitle">Browse and select equipment to borrow</p>
-            </div>
-            <div class="items-grid" id="items-grid">
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p class="loading-text">Loading available equipment...</p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- QR Scanner Modal -->
-    <div class="qr-modal" id="qr-modal">
-        <div class="qr-modal-content">
-            <div class="qr-modal-header">
-                <h2 class="qr-modal-title">Scan Equipment QR Code</h2>
-                <button class="close-modal-btn" id="close-qr-modal">&times;</button>
-            </div>
-            <div class="qr-scanner-container">
-                <div class="scanner-placeholder" id="scanner-placeholder"></div>
-                <div class="scanner-overlay">
-                    <div class="scanner-frame"></div>
-                </div>
-            </div>
-            <div class="scanner-instructions">
-                <p>Position the QR code within the frame to scan</p>
-            </div>
-        </div>
+  <div class="page">
+    <div class="page-header">
+      <h1>Emprunt de <span>matériel</span></h1>
+      <p>Sélectionnez les pièces à emprunter pour votre étudiant</p>
     </div>
 
-    <!-- Borrow Modal -->
-    <div class="borrow-modal" id="borrow-modal">
-        <div class="borrow-modal-content">
-            <div class="borrow-modal-header">
-                <h2 class="borrow-modal-title">Borrow Equipment</h2>
-                <button class="close-modal-btn" id="close-borrow-modal">&times;</button>
-            </div>
-            <div class="borrow-modal-body">
-                <div class="modal-item-details" id="modal-item-details">
-                    <!-- Item details will be populated here -->
-                </div>
-
-                <form class="borrow-form" id="borrow-form">
-                    <div class="form-group">
-                        <label class="form-label" for="quantity-input">Quantity</label>
-                        <input type="number" class="form-input" id="quantity-input" min="1" value="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="return-date-input">Expected Return Date</label>
-                        <input type="date" class="form-input" id="return-date-input">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="additional-students-input">Additional Students (comma
-                            separated)</label>
-                        <input type="text" class="form-input" id="additional-students-input"
-                            placeholder="Enter student codes...">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="notes-input">Notes</label>
-                        <textarea class="form-input form-textarea" id="notes-input"
-                            placeholder="Add any additional notes..."></textarea>
-                    </div>
-
-                    <button type="button" class="confirm-borrow-btn" id="confirm-borrow-btn">
-                        Confirm Borrow
-                    </button>
-                </form>
-            </div>
-        </div>
+    <!-- Scan Bar -->
+    <div class="scan-bar">
+      <button class="scan-btn" id="scan-btn">
+        <i class="fas fa-qrcode"></i> Scanner QR Code
+      </button>
+      <div class="or-divider">OU</div>
+      <div class="manual-input-wrap">
+        <input type="text" class="manual-input" id="qr-input" placeholder="Entrez le code manuellement...">
+        <button class="submit-btn" id="submit-btn">Valider</button>
+      </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="../config/api-config.js"></script>
-    <script src="../config/app-config.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="borrowing.js"></script>
+    <!-- Selected Item -->
+    <div class="selected-item-section" id="selected-item-section">
+      <div class="selected-item-header">
+        <div class="selected-item-title">
+          <i class="fas fa-check-circle"></i> Article sélectionné
+        </div>
+        <button class="clear-selection-btn" id="clear-selection-btn">Effacer</button>
+      </div>
+      <div id="selected-item-content"></div>
+    </div>
+
+    <!-- Items -->
+    <div class="items-section">
+      <div class="items-section-header">
+        <div>
+          <h2><i class="fas fa-boxes"></i> Matériel disponible</h2>
+          <p id="items-subtitle">Parcourez et sélectionnez le matériel à emprunter</p>
+        </div>
+      </div>
+      <div class="items-grid" id="items-grid">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Chargement du matériel disponible...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-modal-content">
+      <div class="qr-modal-header">
+        <span class="qr-modal-title">Scanner QR Code du matériel</span>
+        <button class="close-modal-btn" id="close-qr-modal">&times;</button>
+      </div>
+      <div class="qr-scanner-container">
+        <div class="scanner-placeholder" id="scanner-placeholder"></div>
+        <div class="scanner-overlay"><div class="scanner-frame"></div></div>
+      </div>
+      <div class="scanner-instructions"><p>Positionnez le QR code dans le cadre pour scanner</p></div>
+    </div>
+  </div>
+
+  <!-- Borrow Modal -->
+  <div class="borrow-modal" id="borrow-modal">
+    <div class="borrow-modal-content">
+      <div class="borrow-modal-header">
+        <span class="borrow-modal-title">Confirmer l'emprunt</span>
+        <button class="close-modal-btn" id="close-borrow-modal">&times;</button>
+      </div>
+      <div class="borrow-modal-body">
+        <div class="modal-item-details" id="modal-item-details"></div>
+        <form class="borrow-form" id="borrow-form">
+          <div class="form-group">
+            <label class="form-label">Quantité</label>
+            <input type="number" class="form-input" id="quantity-input" min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date de retour prévue</label>
+            <input type="date" class="form-input" id="return-date-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Étudiants supplémentaires (codes séparés par virgule)</label>
+            <input type="text" class="form-input" id="additional-students-input" placeholder="Entrez les codes étudiants...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-input form-textarea" id="notes-input" placeholder="Notes supplémentaires..."></textarea>
+          </div>
+          <button type="button" class="confirm-borrow-btn" id="confirm-borrow-btn">
+            <i class="fas fa-check"></i> Confirmer l'emprunt
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config/api-config.js"></script>
+  <script src="../config/app-config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="borrowing.js"></script>
 </body>
-
 </html>

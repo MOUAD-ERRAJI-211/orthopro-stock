@@ -1,204 +1,333 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student History - OrthoProConnect</title>
-      <link rel="stylesheet" href="../assets/css/design-system.css">
-  <link rel="stylesheet" href="history.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthoStock | Historique des transactions</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background: var(--bg); min-height: 100vh; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.9rem;
+    }
+    .brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: white; }
+    .brand-name strong { color: var(--primary-light); }
+    .back-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.9rem; border-radius: var(--radius);
+      border: 1.5px solid rgba(255,255,255,0.2); background: none;
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      text-decoration: none; transition: var(--transition);
+    }
+    .back-link:hover { border-color: rgba(255,255,255,0.5); color: white; }
+
+    .page { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-display); font-size: 1.8rem; color: var(--text); margin-bottom: 0.3rem; }
+    .page-header h1 span { color: var(--primary); }
+    .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Search section */
+    .search-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .search-card h2 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .search-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .search-input-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-input-wrap i { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+    .student-search-input, #student-search {
+      width: 100%; padding: 0.7rem 1rem 0.7rem 2.4rem;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-body); font-size: 0.9rem; color: var(--text);
+      outline: none; transition: var(--transition);
+    }
+    .student-search-input:focus, #student-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .search-btn, #search-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.25rem; border-radius: var(--radius);
+      background: var(--primary); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); white-space: nowrap;
+    }
+    .search-btn:hover, #search-btn:hover { background: var(--primary-light); }
+
+    .or-divider {
+      display: flex; align-items: center; gap: 0.5rem;
+      color: var(--text-light); font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+    }
+
+    .scan-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.25rem; border-radius: var(--radius);
+      border: 2px dashed var(--primary); background: var(--primary-glow);
+      color: var(--primary); font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .scan-btn:hover { background: var(--primary); color: white; }
+
+    /* Error */
+    .error-message, #error-message {
+      padding: 0.8rem 1rem; border-radius: var(--radius);
+      background: var(--danger-light); border: 1px solid rgba(239,68,68,0.2);
+      color: var(--danger); font-size: 0.85rem; margin-bottom: 1rem;
+      display: none; align-items: center; gap: 0.5rem;
+    }
+    #error-message:not(:empty) { display: flex; }
+
+    /* Student profile */
+    .student-card, #student-info {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+      display: none;
+    }
+    #student-info.show { display: block; }
+    .student-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .profile-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.3rem; flex-shrink: 0;
+    }
+    .profile-details h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .profile-details p { font-size: 0.85rem; color: var(--text-muted); }
+
+    .activity-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .summary-card { background: var(--surface-2); border-radius: var(--radius); border: 1px solid var(--border); padding: 1rem; text-align: center; }
+    .summary-count { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .total-count { color: var(--primary); }
+    .checkout-count { color: var(--warning); }
+    .return-count { color: var(--success); }
+    .pending-count { color: var(--danger); }
+    .summary-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* History section */
+    .history-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .history-card-header {
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--surface-2);
+    }
+    .history-card-header h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+    /* Tabs */
+    .tab-nav {
+      display: flex; border-bottom: 2px solid var(--border);
+      padding: 0 1.5rem; background: var(--surface);
+    }
+    .tab-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.9rem 1rem; background: none; border: none;
+      font-family: var(--font-body); font-size: 0.88rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; transition: var(--transition);
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-badge {
+      padding: 0.15rem 0.5rem; border-radius: 100px;
+      background: var(--bg); font-size: 0.72rem; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .tab-btn.active .tab-badge { background: var(--primary-glow); color: var(--primary); }
+
+    .tab-content { padding: 1.5rem; }
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+
+    .section-title { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
+
+    .items-grid, #pending-items-grid, #returned-items-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .empty-state {
+      text-align: center; padding: 3rem; color: var(--text-muted);
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
+    .empty-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .empty-description { font-size: 0.85rem; }
+    .hidden { display: none !important; }
+
+    /* Loading */
+    .loading-state { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 3rem; color: var(--text-muted); }
+    .loading-spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* QR Modal */
+    .qr-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,35,0.7); backdrop-filter: blur(6px);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .qr-modal.active { display: flex; }
+    .qr-modal-content {
+      width: 100%; max-width: 420px; background: var(--surface);
+      border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg);
+    }
+    .qr-modal-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .qr-modal-title { color: white; font-size: 1rem; font-weight: 600; }
+    .close-modal-btn {
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .close-modal-btn:hover { background: rgba(255,255,255,0.3); }
+    .qr-scanner-container { padding: 1.5rem; position: relative; }
+    .scanner-placeholder { width: 100%; height: 280px; background: #1a2535; border-radius: var(--radius-md); }
+    .scanner-overlay { position: absolute; inset: 1.5rem; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+    .scanner-frame { width: 180px; height: 180px; border: 2px solid var(--primary); border-radius: 12px; }
+    .scanner-instructions { padding: 0 1.5rem 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+
+    @media (max-width: 640px) {
+      .activity-summary { grid-template-columns: repeat(2, 1fr); }
+      .search-row { flex-direction: column; align-items: stretch; }
+      .page { padding: 1rem; }
+    }
+  </style>
 </head>
-
 <body>
-    <!-- Header Section -->
-    <header class="header">
-        <div class="header-content">
-            <div class="brand-section">
-                <h1 class="page-title">
-                    <svg class="title-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12.04H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
-                    </svg>
-                    Student Transaction History
-                </h1>
-                <p class="page-subtitle">View student borrowing and return history</p>
-            </div>
-            <a href="../dashboard/dashboard.html" class="back-btn">
-                <svg class="back-icon" viewBox="0 0 24 24">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                </svg>
-                Back to Dashboard
-            </a>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Search Section -->
-        <section class="search-section">
-            <div class="search-header">
-                <div class="search-container">
-                    <h2 class="search-title">
-                        <svg class="search-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                        </svg>
-                        Find Student
-                    </h2>
-                    <div class="search-options">
-                        <div class="search-input-group">
-                            <input type="text" class="student-search-input" id="student-search"
-                                placeholder="Enter student name or code" />
-                            <button class="search-btn" id="search-btn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path
-                                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-                                </svg>
-                                Search
-                            </button>
-                        </div>
-                        <div class="divider">OR</div>
-                        <button class="scan-btn" id="scan-btn">
-                            <svg class="scan-icon" viewBox="0 0 24 24">
-                                <path
-                                    d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v4h-4v2h6v-6zm-2-8h2v2h-2V5zM7 7h2v2H7V7zm12 12v2h-2v-2h2zm-6 0h2v2h-2v-2zm-6 0h2v2H7v-2zm-2-2h2v2H5v-2z" />
-                            </svg>
-                            Scan QR Code
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
+  <nav class="navbar">
+    <a href="../dashboard/dashboard.html" class="brand">
+      <div class="brand-icon"><i class="fas fa-boxes"></i></div>
+      <span class="brand-name">Ortho<strong>Stock</strong></span>
+    </a>
+    <a href="../dashboard/dashboard.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Tableau de bord
+    </a>
+  </nav>
 
-        <!-- Error Message -->
-        <div class="error-message" id="error-message"></div>
-
-        <!-- Student Info Section -->
-        <section class="student-info" id="student-info">
-            <div class="student-profile">
-                <div class="profile-avatar">
-                    <svg class="avatar-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                </div>
-                <div class="profile-details">
-                    <h3 id="student-name">--</h3>
-                    <p id="student-code">--</p>
-                    <p id="student-class">--</p>
-                </div>
-            </div>
-
-            <div class="activity-summary">
-                <div class="summary-card">
-                    <div class="summary-count total-count" id="total-count">--</div>
-                    <div class="summary-label">Total Transactions</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-count checkout-count" id="checkout-count">--</div>
-                    <div class="summary-label">Checkouts</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-count return-count" id="return-count">--</div>
-                    <div class="summary-label">Returns</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-count pending-count" id="pending-count">--</div>
-                    <div class="summary-label">Pending</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- History Display Section -->
-        <section class="history-display">
-            <div class="history-header">
-                <h2 class="history-title">
-                    <svg class="history-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                    </svg>
-                    Transaction History
-                </h2>
-            </div>
-
-            <nav class="tab-navigation">
-                <button class="tab-btn active" id="pending-tab">
-                    Items to Return
-                    <span class="tab-badge" id="pending-badge">0</span>
-                </button>
-                <button class="tab-btn" id="returned-tab">
-                    Returned Items
-                    <span class="tab-badge" id="returned-badge">0</span>
-                </button>
-            </nav>
-
-            <div class="tab-content">
-                <!-- Pending Items Section -->
-                <div class="tab-section active" id="pending-section">
-                    <h3 class="section-title">Items to be Returned</h3>
-                    <div class="empty-state hidden" id="no-pending-items">
-                        <svg class="empty-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M9 16.2l-3.5-3.5c-.39-.39-1.01-.39-1.4 0-.39.39-.39 1.01 0 1.4l4.19 4.19c.39.39 1.02.39 1.41 0L20.3 7.7c.39-.39.39-1.01 0-1.4-.39-.39-1.01-.39-1.4 0L9 16.2z" />
-                        </svg>
-                        <h4 class="empty-title">No Items Pending Return</h4>
-                        <p class="empty-description">All items have been returned or are consumables</p>
-                    </div>
-                    <div class="items-grid" id="pending-items-grid">
-                        <!-- Pending items will be inserted here -->
-                    </div>
-                </div>
-
-                <!-- Returned Items Section -->
-                <div class="tab-section" id="returned-section">
-                    <h3 class="section-title">Returned Items</h3>
-                    <div class="empty-state hidden" id="no-returned-items">
-                        <svg class="empty-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-                        </svg>
-                        <h4 class="empty-title">No Returned Items</h4>
-                        <p class="empty-description">No items have been returned in this period</p>
-                    </div>
-                    <div class="items-grid" id="returned-items-grid">
-                        <!-- Returned items will be inserted here -->
-                    </div>
-                </div>
-
-                <!-- Loading State -->
-                <div class="loading-state hidden" id="loading-spinner">
-                    <div class="loading-spinner"></div>
-                    <p class="loading-text">Loading transaction history...</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- QR Scanner Modal -->
-    <div class="qr-modal" id="qr-modal">
-        <div class="qr-modal-content">
-            <div class="qr-modal-header">
-                <h2 class="qr-modal-title">Scan Student QR Code</h2>
-                <button class="close-modal-btn" id="close-modal">&times;</button>
-            </div>
-            <div class="qr-scanner-container">
-                <div class="scanner-placeholder" id="scanner-placeholder"></div>
-                <div class="scanner-overlay">
-                    <div class="scanner-frame"></div>
-                </div>
-            </div>
-            <div class="scanner-instructions">
-                <p>Position the QR code within the frame to scan</p>
-            </div>
-        </div>
+  <div class="page">
+    <div class="page-header">
+      <h1>Historique des <span>transactions</span></h1>
+      <p>Consultez l'historique d'emprunt et de retour des étudiants</p>
     </div>
 
-    <!-- Scripts -->
-    <script src="../config/api-config.js"></script>
-    <script src="../config/app-config.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="history.js"></script>
-</body>
+    <!-- Search -->
+    <div class="search-card">
+      <h2><i class="fas fa-search"></i> Trouver un étudiant</h2>
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <i class="fas fa-id-card"></i>
+          <input type="text" class="student-search-input" id="student-search" placeholder="Nom ou code étudiant">
+        </div>
+        <button class="search-btn" id="search-btn">
+          <i class="fas fa-search"></i> Rechercher
+        </button>
+        <div class="or-divider">OU</div>
+        <button class="scan-btn" id="scan-btn">
+          <i class="fas fa-qrcode"></i> Scanner QR Code
+        </button>
+      </div>
+    </div>
 
+    <div class="error-message" id="error-message"></div>
+
+    <!-- Student Info -->
+    <div id="student-info">
+      <div class="student-profile">
+        <div class="profile-avatar"><i class="fas fa-user"></i></div>
+        <div class="profile-details">
+          <h3 id="student-name">—</h3>
+          <p id="student-code">—</p>
+          <p id="student-class">—</p>
+        </div>
+      </div>
+      <div class="activity-summary">
+        <div class="summary-card"><div class="summary-count total-count" id="total-count">—</div><div class="summary-label">Total</div></div>
+        <div class="summary-card"><div class="summary-count checkout-count" id="checkout-count">—</div><div class="summary-label">Emprunts</div></div>
+        <div class="summary-card"><div class="summary-count return-count" id="return-count">—</div><div class="summary-label">Retours</div></div>
+        <div class="summary-card"><div class="summary-count pending-count" id="pending-count">—</div><div class="summary-label">En cours</div></div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="history-card">
+      <div class="history-card-header">
+        <i class="fas fa-history" style="color: var(--primary);"></i>
+        <h2>Historique des transactions</h2>
+      </div>
+      <div class="tab-nav">
+        <button class="tab-btn active" id="pending-tab">
+          <i class="fas fa-clock"></i> À retourner
+          <span class="tab-badge" id="pending-badge">0</span>
+        </button>
+        <button class="tab-btn" id="returned-tab">
+          <i class="fas fa-check"></i> Retournés
+          <span class="tab-badge" id="returned-badge">0</span>
+        </button>
+      </div>
+      <div class="tab-content">
+        <div class="tab-section active" id="pending-section">
+          <div class="section-title">Articles à retourner</div>
+          <div class="empty-state hidden" id="no-pending-items">
+            <i class="fas fa-check-circle empty-icon" style="color: var(--success);"></i>
+            <h4 class="empty-title">Aucun article en attente</h4>
+            <p class="empty-description">Tous les articles ont été retournés</p>
+          </div>
+          <div class="items-grid" id="pending-items-grid"></div>
+        </div>
+        <div class="tab-section" id="returned-section">
+          <div class="section-title">Articles retournés</div>
+          <div class="empty-state hidden" id="no-returned-items">
+            <i class="fas fa-info-circle empty-icon"></i>
+            <h4 class="empty-title">Aucun article retourné</h4>
+            <p class="empty-description">Aucun article n'a encore été retourné</p>
+          </div>
+          <div class="items-grid" id="returned-items-grid"></div>
+        </div>
+        <div class="loading-state hidden" id="loading-spinner">
+          <div class="loading-spinner"></div>
+          <p>Chargement de l'historique...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-modal-content">
+      <div class="qr-modal-header">
+        <span class="qr-modal-title">Scanner QR Code Étudiant</span>
+        <button class="close-modal-btn" id="close-modal">&times;</button>
+      </div>
+      <div class="qr-scanner-container">
+        <div class="scanner-placeholder" id="scanner-placeholder"></div>
+        <div class="scanner-overlay"><div class="scanner-frame"></div></div>
+      </div>
+      <div class="scanner-instructions"><p>Positionnez le QR code dans le cadre pour scanner</p></div>
+    </div>
+  </div>
+
+  <script src="../config/api-config.js"></script>
+  <script src="../config/app-config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="history.js"></script>
+</body>
 </html>

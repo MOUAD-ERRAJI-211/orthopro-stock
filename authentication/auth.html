@@ -1,66 +1,205 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication - OrthoProConnect</title>
-      <link rel="stylesheet" href="../assets/css/design-system.css">
-  <link rel="stylesheet" href="./auth.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthoStock | Authentification Étudiant</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.9rem;
+    }
+    .brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: white; }
+    .brand-name strong { color: var(--primary-light); }
+    .back-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.9rem; border-radius: var(--radius);
+      border: 1.5px solid rgba(255,255,255,0.2); background: none;
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      text-decoration: none; transition: var(--transition);
+    }
+    .back-link:hover { border-color: rgba(255,255,255,0.5); color: white; }
+
+    .page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+
+    .auth-card {
+      width: 100%; max-width: 440px;
+      background: var(--surface); border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .auth-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 2rem; text-align: center;
+    }
+    .auth-header-icon {
+      width: 60px; height: 60px; border-radius: 18px;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; color: white; margin: 0 auto 1rem;
+    }
+    .auth-header h1 { color: white; font-size: 1.3rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .auth-header p { color: rgba(255,255,255,0.8); font-size: 0.88rem; }
+
+    .auth-body { padding: 2rem; }
+
+    .scan-btn {
+      width: 100%; padding: 1rem; border-radius: var(--radius-md);
+      border: 2px dashed var(--primary); background: var(--primary-glow);
+      color: var(--primary); font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+    .scan-btn:hover { background: var(--primary); color: white; }
+    .scan-btn i { font-size: 1.2rem; }
+
+    .or-divider {
+      display: flex; align-items: center; gap: 1rem;
+      color: var(--text-light); font-size: 0.78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;
+    }
+    .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .input-group { position: relative; margin-bottom: 1rem; }
+    .input-group i {
+      position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%);
+      color: var(--text-light); font-size: 0.9rem;
+    }
+    .student-code-input, #student-code {
+      width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      font-family: var(--font-body); font-size: 1rem; color: var(--text);
+      outline: none; transition: var(--transition); background: var(--surface);
+    }
+    .student-code-input:focus, #student-code:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .student-code-input::placeholder, #student-code::placeholder { color: var(--text-light); }
+
+    .login-btn {
+      width: 100%; padding: 0.8rem; border-radius: var(--radius-md);
+      background: var(--primary); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .login-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+
+    .error-message, #error-message {
+      margin-top: 1rem; padding: 0.8rem 1rem;
+      background: var(--danger-light); border: 1px solid rgba(239,68,68,0.2);
+      border-radius: var(--radius); color: var(--danger);
+      font-size: 0.85rem; display: none;
+    }
+    .error-message.show, #error-message:not(:empty) { display: flex; align-items: center; gap: 0.5rem; }
+
+    /* QR Modal */
+    .qr-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,35,0.7); backdrop-filter: blur(6px);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .qr-modal.active { display: flex; }
+    .qr-modal-content {
+      width: 100%; max-width: 420px;
+      background: var(--surface); border-radius: var(--radius-lg);
+      overflow: hidden; box-shadow: var(--shadow-lg);
+    }
+    .qr-modal-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .qr-modal-title { color: white; font-size: 1rem; font-weight: 600; }
+    .close-modal-btn {
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+    }
+    .close-modal-btn:hover { background: rgba(255,255,255,0.3); }
+    .qr-scanner-container { padding: 1.5rem; }
+    .scanner-placeholder { width: 100%; height: 280px; background: #1a2535; border-radius: var(--radius-md); }
+    .scanner-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+    .scanner-frame { width: 180px; height: 180px; border: 2px solid var(--primary); border-radius: 12px; }
+    .scanner-instructions { padding: 0 1.5rem 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+  </style>
 </head>
-
 <body>
-    <div class="auth-container">
-        <!-- Header Section -->
-        <div class="auth-header">
-            <a href="../dashboard/dashboard.html" class="back-arrow">&larr;</a>
-            <h1 class="brand-title">OrthoProConnect</h1>
-            <p class="auth-subtitle">Student Authentication</p>
+
+  <nav class="navbar">
+    <a href="../dashboard/dashboard.html" class="brand">
+      <div class="brand-icon"><i class="fas fa-boxes"></i></div>
+      <span class="brand-name">Ortho<strong>Stock</strong></span>
+    </a>
+    <a href="../dashboard/dashboard.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Tableau de bord
+    </a>
+  </nav>
+
+  <div class="page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-header-icon"><i class="fas fa-qrcode"></i></div>
+        <h1>Authentification Étudiant</h1>
+        <p>Scannez votre QR code ou entrez votre code étudiant</p>
+      </div>
+      <div class="auth-body">
+        <button class="scan-btn" id="scan-btn">
+          <i class="fas fa-qrcode"></i> Scanner le QR Code
+        </button>
+
+        <div class="or-divider">OU</div>
+
+        <div class="input-group">
+          <i class="fas fa-id-card"></i>
+          <input type="text" class="student-code-input" id="student-code" placeholder="Entrez votre code étudiant" autocomplete="off">
         </div>
 
-        <!-- Content Section -->
-        <div class="auth-content">
-            <div class="auth-options">
-                <!-- QR Scanner Section -->
-                <div class="qr-scanner-section">
-                    <button class="scan-btn" id="scan-btn">
-                        <svg class="scan-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v4h-4v2h6v-6zm-2-8h2v2h-2V5zM7 7h2v2H7V7zm12 12v2h-2v-2h2zm-6 0h2v2h-2v-2zm-6 0h2v2H7v-2zm-2-2h2v2H5v-2z" />
-                        </svg>
-                        Scan QR Code
-                    </button>
-                </div>
+        <button class="login-btn" id="login-btn">
+          <i class="fas fa-sign-in-alt"></i> Se connecter
+        </button>
 
-                <!-- Divider -->
-                <div class="divider">OR</div>
-
-                <!-- Code Input Section -->
-                <div class="code-input-section">
-                    <input type="text" class="student-code-input" id="student-code" placeholder="Enter Student Code"
-                        autocomplete="off">
-                    <button class="login-btn" id="login-btn">
-                        <svg class="login-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z" />
-                        </svg>
-                        Login
-                    </button>
-                </div>
-            </div>
-
-            <!-- Error Message -->
-            <div class="error-message" id="error-message"></div>
-        </div>
+        <div class="error-message" id="error-message"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="../config/api-config.js"></script>
-    <script src="../config/app-config.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="auth.js"></script>
+  <!-- QR Scanner Modal -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-modal-content">
+      <div class="qr-modal-header">
+        <span class="qr-modal-title">Scanner QR Code Étudiant</span>
+        <button class="close-modal-btn" id="close-modal">&times;</button>
+      </div>
+      <div class="qr-scanner-container" style="position: relative;">
+        <div class="scanner-placeholder" id="scanner-placeholder"></div>
+        <div class="scanner-overlay">
+          <div class="scanner-frame"></div>
+        </div>
+      </div>
+      <div class="scanner-instructions">
+        <p>Positionnez le QR code dans le cadre pour scanner</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config/api-config.js"></script>
+  <script src="../config/app-config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="auth.js"></script>
 </body>
-
 </html>
-

@@ -1,392 +1,545 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management - OrthoProConnect</title>
-      <link rel="stylesheet" href="../assets/css/design-system.css">
-  <link rel="stylesheet" href="inventory.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthoStock | Inventaire</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background: var(--bg); min-height: 100vh; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.9rem;
+    }
+    .brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: white; }
+    .brand-name strong { color: var(--primary-light); }
+    .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .notif-btn, #notification-btn {
+      position: relative; width: 36px; height: 36px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.2); background: none;
+      color: rgba(255,255,255,0.7); cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+    }
+    .notif-btn:hover, #notification-btn:hover { border-color: rgba(255,255,255,0.5); color: white; }
+    .notification-badge, #notification-badge {
+      position: absolute; top: -4px; right: -4px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--danger); color: white;
+      font-size: 0.65rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .back-link, #back-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.9rem; border-radius: var(--radius);
+      border: 1.5px solid rgba(255,255,255,0.2); background: none;
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .back-link:hover, #back-btn:hover { border-color: rgba(255,255,255,0.5); color: white; }
+
+    .page { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .page-header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { font-family: var(--font-display); font-size: 1.8rem; color: var(--text); margin-bottom: 0.3rem; }
+    .page-header h1 span { color: var(--primary); }
+    .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Controls */
+    .controls-bar {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem; display: flex; gap: 1rem;
+      align-items: center; flex-wrap: wrap;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap i { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-light); font-size: 0.85rem; }
+    .search-input, #search-input {
+      width: 100%; padding: 0.6rem 1rem 0.6rem 2.4rem;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-body); font-size: 0.88rem; color: var(--text);
+      outline: none; transition: var(--transition);
+    }
+    .search-input:focus, #search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+    .filter-select, #category-filter, #stock-filter, #month-selector {
+      padding: 0.6rem 1rem; border-radius: var(--radius);
+      border: 1.5px solid var(--border); background: var(--surface);
+      font-family: var(--font-body); font-size: 0.88rem; color: var(--text);
+      cursor: pointer; outline: none; transition: var(--transition);
+    }
+    .filter-select:focus { border-color: var(--primary); }
+
+    .controls-divider { width: 1px; height: 32px; background: var(--border); }
+    .action-btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* Table */
+    .table-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .table-wrapper { overflow-x: auto; }
+    .inventory-table, #inventory-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem;
+    }
+    thead tr { background: var(--surface-2); border-bottom: 2px solid var(--border); }
+    thead th {
+      padding: 0.85rem 1rem; text-align: left;
+      font-size: 0.75rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--primary-glow); }
+    td { padding: 0.85rem 1rem; color: var(--text); vertical-align: middle; }
+
+    /* Modals */
+    .modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,35,0.5); backdrop-filter: blur(6px);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .modal.active, .modal.show { display: flex; animation: fadeIn 0.25s ease; }
+    .modal-content {
+      width: 100%; max-width: 680px;
+      background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); overflow: hidden;
+      max-height: 90vh; overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0;
+    }
+    .modal-header h2 { color: white; font-size: 1rem; font-weight: 600; }
+    .close-btn {
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+      transition: var(--transition);
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.3); }
+    .modal-body { padding: 1.5rem; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group.full-width { grid-column: 1/-1; }
+    .form-group label {
+      font-size: 0.8rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .form-input {
+      padding: 0.65rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-body); font-size: 0.9rem; color: var(--text);
+      outline: none; transition: var(--transition); background: var(--surface);
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    textarea.form-input { resize: vertical; min-height: 80px; }
+
+    .form-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+    .submit-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.5rem; border-radius: var(--radius);
+      background: var(--primary); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+    }
+    .submit-btn:hover { background: var(--primary-light); }
+    .cancel-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.25rem; border-radius: var(--radius);
+      border: 1.5px solid var(--border); background: none;
+      font-family: var(--font-body); font-size: 0.9rem; color: var(--text-muted);
+      cursor: pointer; transition: var(--transition);
+    }
+    .cancel-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Item details modal */
+    .item-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .item-basic-info { display: flex; flex-direction: column; gap: 1rem; }
+    .item-image-container {
+      position: relative; width: 100%; height: 160px;
+      border-radius: var(--radius-md); border: 1px solid var(--border);
+      overflow: hidden; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .item-image { width: 100%; height: 100%; object-fit: cover; }
+    .upload-btn, #upload-image-btn {
+      position: absolute; bottom: 0.5rem; right: 0.5rem;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); color: white; border: none;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .info-item { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+    .info-label { color: var(--text-muted); font-weight: 500; }
+    .info-value { color: var(--text); font-weight: 600; }
+
+    .stats-tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; }
+    .tab-btn {
+      padding: 0.45rem 0.9rem; border-radius: var(--radius);
+      border: 1.5px solid var(--border); background: none;
+      font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; transition: var(--transition);
+    }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .threshold-input {
+      width: 100%; padding: 0.6rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: var(--font-body); font-size: 0.9rem; color: var(--text);
+      outline: none; transition: var(--transition); margin-bottom: 0.75rem;
+    }
+    .threshold-input:focus { border-color: var(--primary); }
+    .save-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.6rem 1.25rem; border-radius: var(--radius);
+      background: var(--success); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+    }
+    .save-btn:hover { background: #16a34a; }
+
+    /* Notification panel */
+    .notification-panel {
+      position: fixed; top: 60px; right: 0; width: 320px;
+      background: var(--surface); border-left: 1px solid var(--border);
+      box-shadow: var(--shadow-lg); height: calc(100vh - 60px);
+      transform: translateX(100%); transition: transform 0.3s ease;
+      z-index: 500; display: flex; flex-direction: column;
+    }
+    .notification-panel.open { transform: translateX(0); }
+    .notification-panel-header {
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface-2);
+    }
+    .notification-panel-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+    .notification-panel-content { flex: 1; overflow-y: auto; padding: 1rem; }
+
+    /* Loading overlay */
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(255,255,255,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000;
+    }
+    .loading-content { text-align: center; }
+    .spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+    }
+    .spinner.large { width: 48px; height: 48px; }
+
+    /* Toast */
+    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+
+    /* QR Modal */
+    .qr-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,35,0.7); backdrop-filter: blur(6px);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .qr-modal.active { display: flex; }
+    .qr-modal-content {
+      width: 100%; max-width: 420px; background: var(--surface);
+      border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg);
+    }
+    .qr-modal-header {
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .qr-modal-title { color: white; font-size: 1rem; font-weight: 600; }
+    .close-modal-btn {
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .qr-scanner-container { padding: 1.5rem; position: relative; }
+    .scanner-placeholder { width: 100%; height: 280px; background: #1a2535; border-radius: var(--radius-md); }
+    .scanner-overlay { position: absolute; inset: 1.5rem; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+    .scanner-frame { width: 180px; height: 180px; border: 2px solid var(--primary); border-radius: 12px; }
+    .scanner-instructions { padding: 0 1.5rem 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media (max-width: 1024px) {
+      .item-details-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .page { padding: 1rem; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Background Elements -->
-    <div class="bg-elements">
-        <div class="bg-element bg-element-1"></div>
-        <div class="bg-element bg-element-2"></div>
-        <div class="bg-element bg-element-3"></div>
+
+  <nav class="navbar">
+    <a href="../dashboard/dashboard.html" class="brand">
+      <div class="brand-icon"><i class="fas fa-boxes"></i></div>
+      <span class="brand-name">Ortho<strong>Stock</strong></span>
+    </a>
+    <div class="navbar-right">
+      <button class="notif-btn" id="notification-btn">
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge" id="notification-badge">0</span>
+      </button>
+      <button class="back-link" id="back-btn">
+        <i class="fas fa-arrow-left"></i> Tableau de bord
+      </button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <div>
+        <h1>Gestion de <span>l'inventaire</span></h1>
+        <p>Consultez et gérez le catalogue complet des pièces orthoprothétiques</p>
+      </div>
     </div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="brand-section">
-                <h1 class="page-title">
-                    <i class="fas fa-boxes"></i>
-                    Inventory Management
-                </h1>
-                <p class="page-subtitle">Manage your equipment and stock</p>
-            </div>
-            <div class="header-actions">
-                <button class="notification-btn" id="notification-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge" id="notification-badge">0</span>
-                </button>
-                <button class="back-btn" id="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                    Dashboard
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Controls Section -->
-        <section class="controls-section">
-            <div class="search-controls">
-                <div class="search-group">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-input" placeholder="Search inventory..." class="search-input">
-                </div>
-                <select id="category-filter" class="filter-select">
-                    <option value="">All Categories</option>
-                </select>
-                <select id="stock-filter" class="filter-select">
-                    <option value="">All Stock Levels</option>
-                    <option value="low">Low Stock</option>
-                    <option value="critical">Critical Stock</option>
-                    <option value="out">Out of Stock</option>
-                </select>
-                <button id="search-btn" class="search-btn">
-                    <i class="fas fa-search"></i>
-                    Search
-                </button>
-            </div>
-            
-            <div class="action-controls">
-                <button id="add-piece-btn" class="action-btn primary">
-                    <i class="fas fa-plus"></i>
-                    Add Piece
-                </button>
-                <button id="add-student-btn" class="action-btn secondary">
-                    <i class="fas fa-user-plus"></i>
-                    Add Student
-                </button>
-                <div class="export-controls">
-                    <select id="month-selector" class="month-select">
-                        <option value="">Select Month</option>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                    <button id="export-month-btn" class="action-btn export">
-                        <i class="fas fa-file-pdf"></i>
-                        Export Stock
-                    </button>
-                    <button id="export-adjustments-btn" class="action-btn export">
-                        <i class="fas fa-history"></i>
-                        Export History
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Inventory Table -->
-        <section class="table-section">
-            <div class="table-container">
-                <table id="inventory-table" class="inventory-table">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Type</th>
-                            <th>Supplier</th>
-                            <th>Reference</th>
-                            <th>Initial Stock</th>
-                            <th>Entries</th>
-                            <th>Exits</th>
-                            <th>Current Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Table content will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <!-- Notification Panel -->
-    <div class="notification-panel" id="notification-panel">
-        <div class="notification-panel-header">
-            <h3><i class="fas fa-bell"></i> Stock Alerts</h3>
-            <button class="close-btn" id="close-notifications">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="notification-panel-content" id="notification-panel-content">
-            <!-- Notifications will be populated here -->
-        </div>
+    <!-- Controls -->
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Rechercher dans l'inventaire..." class="search-input">
+      </div>
+      <select id="category-filter" class="filter-select">
+        <option value="">Toutes les catégories</option>
+      </select>
+      <select id="stock-filter" class="filter-select">
+        <option value="">Tous les niveaux</option>
+        <option value="low">Stock bas</option>
+        <option value="critical">Stock critique</option>
+        <option value="out">Rupture de stock</option>
+      </select>
+      <button id="search-btn" class="btn btn-primary btn-sm">
+        <i class="fas fa-search"></i> Rechercher
+      </button>
+      <div class="controls-divider"></div>
+      <div class="action-btn-group">
+        <button id="add-piece-btn" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus"></i> Ajouter une pièce
+        </button>
+        <button id="add-student-btn" class="btn btn-outline btn-sm">
+          <i class="fas fa-user-plus"></i> Ajouter étudiant
+        </button>
+        <select id="month-selector" class="filter-select">
+          <option value="">Sélectionner un mois</option>
+          <option value="1">Janvier</option><option value="2">Février</option>
+          <option value="3">Mars</option><option value="4">Avril</option>
+          <option value="5">Mai</option><option value="6">Juin</option>
+          <option value="7">Juillet</option><option value="8">Août</option>
+          <option value="9">Septembre</option><option value="10">Octobre</option>
+          <option value="11">Novembre</option><option value="12">Décembre</option>
+        </select>
+        <button id="export-month-btn" class="btn btn-ghost btn-sm">
+          <i class="fas fa-file-pdf"></i> Export stock
+        </button>
+        <button id="export-adjustments-btn" class="btn btn-ghost btn-sm">
+          <i class="fas fa-history"></i> Export historique
+        </button>
+      </div>
     </div>
 
-    <!-- Item Details Modal -->
-    <div class="modal" id="item-details-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-item-name">Item Details</h2>
-                <button class="close-btn" id="close-item-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="item-details-grid">
-                    <!-- Item Basic Info -->
-                    <div class="item-basic-info">
-                        <div class="item-image-container">
-                            <img id="modal-item-image" src="" alt="Item image" class="item-image">
-                            <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
-                            <button class="upload-btn" id="upload-image-btn" title="Upload Image">
-                                <i class="fas fa-camera"></i>
-                            </button>
-                            <div class="loading-overlay" id="image-loading-overlay" style="display: none;">
-                                <div class="spinner"></div>
-                            </div>
-                        </div>
-                        <div class="item-info">
-                            <div class="info-item">
-                                <span class="info-label">Category:</span>
-                                <span id="modal-item-category" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Type:</span>
-                                <span id="modal-item-type" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Current Stock:</span>
-                                <span id="modal-item-stock" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Location:</span>
-                                <span id="modal-item-location" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Reference:</span>
-                                <span id="modal-item-reference" class="info-value">-</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Usage Statistics -->
-                    <div class="usage-stats">
-                        <h3>Usage Statistics</h3>
-                        <div class="stats-tabs">
-                            <button class="tab-btn active" data-tab="monthly">Monthly</button>
-                            <button class="tab-btn" data-tab="daily">Daily</button>
-                        </div>
-                        <div class="tab-content" id="monthly-tab">
-                            <div id="monthly-transactions" class="monthly-transactions">
-                                <!-- Monthly data will be loaded here -->
-                            </div>
-                        </div>
-                        <div class="tab-content" id="daily-tab" style="display: none;">
-                            <div id="daily-transactions" class="daily-transactions">
-                                <div class="instructions">Select a month and day to view transactions</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stock Thresholds -->
-                    <div class="stock-thresholds">
-                        <h3>Stock Thresholds</h3>
-                        <div class="threshold-form">
-                            <div class="form-group">
-                                <label for="min-threshold">Minimum Threshold:</label>
-                                <input type="number" id="min-threshold" min="0" class="threshold-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="max-threshold">Maximum Threshold:</label>
-                                <input type="number" id="max-threshold" min="0" class="threshold-input">
-                            </div>
-                            <button id="save-thresholds-btn" class="save-btn">
-                                <i class="fas fa-save"></i>
-                                Save Thresholds
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table id="inventory-table" class="inventory-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>ID</th>
+              <th>Nom</th>
+              <th>Catégorie</th>
+              <th>Type</th>
+              <th>Fournisseur</th>
+              <th>Référence</th>
+              <th>Stock initial</th>
+              <th>Entrées</th>
+              <th>Sorties</th>
+              <th>Stock actuel</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
+  </div>
 
-    <!-- Add Piece Modal -->
-    <div class="modal" id="add-piece-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Piece</h2>
-                <button class="close-btn" id="close-piece-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="add-piece-form" class="form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="piece-name">Name*</label>
-                            <input type="text" id="piece-name" required class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-reference">Reference</label>
-                            <input type="text" id="piece-reference" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-category">Category*</label>
-                            <select id="piece-category" required class="form-input">
-                                <option value="">Select Category</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-subcategory">Subcategory*</label>
-                            <input type="text" id="piece-subcategory" required class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-type">Type*</label>
-                            <select id="piece-type" required class="form-input">
-                                <option value="">Select Type</option>
-                                <option value="CONSUMABLE">Consumable</option>
-                                <option value="NON_CONSUMABLE">Non Consumable</option>
-                                <option value="TOOL">Tool</option>
-                                <option value="SPARE_PART">Spare Part</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-supplier">Supplier</label>
-                            <input type="text" id="piece-supplier" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-initial-stock">Initial Stock*</label>
-                            <input type="number" id="piece-initial-stock" min="0" required class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="piece-location">Location*</label>
-                            <input type="text" id="piece-location" required class="form-input">
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="piece-notes">Notes</label>
-                        <textarea id="piece-notes" rows="3" class="form-input"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="submit-btn">
-                            <i class="fas fa-plus"></i>
-                            Add Piece
-                        </button>
-                        <button type="button" class="cancel-btn" id="cancel-piece-btn">
-                            <i class="fas fa-times"></i>
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+  <!-- Notification Panel -->
+  <div class="notification-panel" id="notification-panel">
+    <div class="notification-panel-header">
+      <h3><i class="fas fa-bell"></i> Alertes de stock</h3>
+      <button class="close-btn" id="close-notifications"><i class="fas fa-times"></i></button>
     </div>
+    <div class="notification-panel-content" id="notification-panel-content"></div>
+  </div>
 
-    <!-- Add Student Modal -->
-    <div class="modal" id="add-student-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Student</h2>
-                <button class="close-btn" id="close-student-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+  <!-- Item Details Modal -->
+  <div class="modal" id="item-details-modal">
+    <div class="modal-content" style="max-width: 780px;">
+      <div class="modal-header">
+        <h2 id="modal-item-name">Détails de l'article</h2>
+        <button class="close-btn" id="close-item-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="item-details-grid">
+          <div class="item-basic-info">
+            <div class="item-image-container">
+              <img id="modal-item-image" src="" alt="Image" class="item-image">
+              <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+              <button class="upload-btn" id="upload-image-btn" title="Télécharger une image"><i class="fas fa-camera"></i></button>
+              <div class="loading-overlay" id="image-loading-overlay" style="display: none;"><div class="spinner"></div></div>
             </div>
-            <div class="modal-body">
-                <form id="add-student-form" class="form">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="student-fullname">Full Name*</label>
-                            <input type="text" id="student-fullname" required class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="student-code">Student Code*</label>
-                            <input type="text" id="student-code" required class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="student-email">Email</label>
-                            <input type="email" id="student-email" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="student-class">Class</label>
-                            <input type="text" id="student-class" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="student-academic-year">Academic Year</label>
-                            <input type="text" id="student-academic-year" placeholder="e.g., 2024-2025" class="form-input">
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="submit-btn">
-                            <i class="fas fa-user-plus"></i>
-                            Add Student
-                        </button>
-                        <button type="button" class="cancel-btn" id="cancel-student-btn">
-                            <i class="fas fa-times"></i>
-                            Cancel
-                        </button>
-                    </div>
-                </form>
+            <div>
+              <div class="info-item"><span class="info-label">Catégorie:</span><span id="modal-item-category" class="info-value">—</span></div>
+              <div class="info-item"><span class="info-label">Type:</span><span id="modal-item-type" class="info-value">—</span></div>
+              <div class="info-item"><span class="info-label">Stock actuel:</span><span id="modal-item-stock" class="info-value">—</span></div>
+              <div class="info-item"><span class="info-label">Emplacement:</span><span id="modal-item-location" class="info-value">—</span></div>
+              <div class="info-item"><span class="info-label">Référence:</span><span id="modal-item-reference" class="info-value">—</span></div>
             </div>
+          </div>
+          <div>
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">Statistiques d'utilisation</h3>
+              <div class="stats-tabs">
+                <button class="tab-btn active" data-tab="monthly">Mensuel</button>
+                <button class="tab-btn" data-tab="daily">Journalier</button>
+              </div>
+              <div id="monthly-tab"><div id="monthly-transactions" class="monthly-transactions"></div></div>
+              <div id="daily-tab" style="display: none;"><div id="daily-transactions"><p style="font-size: 0.85rem; color: var(--text-muted);">Sélectionnez un mois et un jour</p></div></div>
+            </div>
+            <div>
+              <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">Seuils de stock</h3>
+              <div class="form-group">
+                <label>Seuil minimum:</label>
+                <input type="number" id="min-threshold" min="0" class="threshold-input">
+              </div>
+              <div class="form-group">
+                <label>Seuil maximum:</label>
+                <input type="number" id="max-threshold" min="0" class="threshold-input">
+              </div>
+              <button id="save-thresholds-btn" class="save-btn">
+                <i class="fas fa-save"></i> Enregistrer
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- QR Scanner Modal -->
-    <div class="qr-modal" id="qr-modal">
-        <div class="qr-modal-content">
-            <div class="qr-modal-header">
-                <h2 class="qr-modal-title">Scan QR Code</h2>
-                <button class="close-modal-btn" id="close-qr-modal">&times;</button>
+  <!-- Add Piece Modal -->
+  <div class="modal" id="add-piece-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Ajouter une pièce</h2>
+        <button class="close-btn" id="close-piece-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="add-piece-form">
+          <div class="form-grid">
+            <div class="form-group"><label>Nom *</label><input type="text" id="piece-name" required class="form-input"></div>
+            <div class="form-group"><label>Référence</label><input type="text" id="piece-reference" class="form-input"></div>
+            <div class="form-group"><label>Catégorie *</label><select id="piece-category" required class="form-input"><option value="">Sélectionner</option></select></div>
+            <div class="form-group"><label>Sous-catégorie *</label><input type="text" id="piece-subcategory" required class="form-input"></div>
+            <div class="form-group"><label>Type *</label>
+              <select id="piece-type" required class="form-input">
+                <option value="">Sélectionner</option>
+                <option value="CONSUMABLE">Consommable</option>
+                <option value="NON_CONSUMABLE">Non consommable</option>
+                <option value="TOOL">Outil</option>
+                <option value="SPARE_PART">Pièce de rechange</option>
+              </select>
             </div>
-            <div class="qr-scanner-container">
-                <div class="scanner-placeholder" id="scanner-placeholder"></div>
-                <div class="scanner-overlay">
-                    <div class="scanner-frame"></div>
-                </div>
-            </div>
-            <div class="scanner-instructions">
-                <p>Position the QR code within the frame</p>
-            </div>
-        </div>
+            <div class="form-group"><label>Fournisseur</label><input type="text" id="piece-supplier" class="form-input"></div>
+            <div class="form-group"><label>Stock initial *</label><input type="number" id="piece-initial-stock" min="0" required class="form-input"></div>
+            <div class="form-group"><label>Emplacement *</label><input type="text" id="piece-location" required class="form-input"></div>
+          </div>
+          <div class="form-group full-width" style="margin-top: 0.5rem;">
+            <label>Notes</label><textarea id="piece-notes" rows="3" class="form-input"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" id="cancel-piece-btn"><i class="fas fa-times"></i> Annuler</button>
+            <button type="submit" class="submit-btn"><i class="fas fa-plus"></i> Ajouter</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay global-loading" id="global-loading" style="display: none;">
-        <div class="loading-content">
-            <div class="spinner large"></div>
-            <p>Loading...</p>
-        </div>
+  <!-- Add Student Modal -->
+  <div class="modal" id="add-student-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Ajouter un étudiant</h2>
+        <button class="close-btn" id="close-student-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="add-student-form">
+          <div class="form-grid">
+            <div class="form-group"><label>Nom complet *</label><input type="text" id="student-fullname" required class="form-input"></div>
+            <div class="form-group"><label>Code étudiant *</label><input type="text" id="student-code" required class="form-input"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="student-email" class="form-input"></div>
+            <div class="form-group"><label>Classe</label><input type="text" id="student-class" class="form-input"></div>
+            <div class="form-group"><label>Année académique</label><input type="text" id="student-academic-year" placeholder="ex: 2024-2025" class="form-input"></div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" id="cancel-student-btn"><i class="fas fa-times"></i> Annuler</button>
+            <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Ajouter</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toast-container"></div>
+  <!-- QR Modal -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-modal-content">
+      <div class="qr-modal-header">
+        <span class="qr-modal-title">Scanner QR Code</span>
+        <button class="close-modal-btn" id="close-qr-modal">&times;</button>
+      </div>
+      <div class="qr-scanner-container">
+        <div class="scanner-placeholder" id="scanner-placeholder"></div>
+        <div class="scanner-overlay"><div class="scanner-frame"></div></div>
+      </div>
+      <div class="scanner-instructions"><p>Positionnez le QR code dans le cadre</p></div>
+    </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="../config/api-config.js"></script>
-    <script src="../config/app-config.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <script src="inventory.js"></script>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="global-loading" style="display: none;">
+    <div class="loading-content">
+      <div class="spinner large"></div>
+      <p>Chargement...</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="../config/api-config.js"></script>
+  <script src="../config/app-config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="inventory.js"></script>
 </body>
 </html>

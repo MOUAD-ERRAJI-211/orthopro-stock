@@ -1,80 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Return Items - OrthoProConnect</title>
-      <link rel="stylesheet" href="../assets/css/design-system.css">
-  <link rel="stylesheet" href="returning.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthoStock | Retour de matériel</title>
+  <link rel="stylesheet" href="../assets/css/design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background: var(--bg); min-height: 100vh; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .brand-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.9rem;
+    }
+    .brand-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: white; }
+    .brand-name strong { color: var(--primary-light); }
+    .back-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.9rem; border-radius: var(--radius);
+      border: 1.5px solid rgba(255,255,255,0.2); background: none;
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      cursor: pointer; transition: var(--transition); font-family: var(--font-body);
+    }
+    .back-link:hover { border-color: rgba(255,255,255,0.5); color: white; }
+
+    .page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-family: var(--font-display); font-size: 1.8rem; color: var(--text); margin-bottom: 0.3rem; }
+    .page-header h1 span { color: var(--primary); }
+    .page-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Return container */
+    .return-card {
+      background: var(--surface); border-radius: var(--radius-md);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .return-card-header {
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.6rem;
+      background: var(--surface-2);
+    }
+    .return-card-header h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .return-card-header p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .return-card-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--warning-light); color: #d97706;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+    }
+    .return-card-body { padding: 1.5rem; }
+
+    /* Items list */
+    .items-list, #return-items-container { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* Loading */
+    .loading, #loading-state {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 1rem; padding: 3rem; color: var(--text-muted);
+    }
+    .loading-spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .loading-text { font-size: 0.9rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Empty state */
+    .empty-state, #empty-state {
+      text-align: center; padding: 3rem; color: var(--text-muted);
+    }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; display: block; color: var(--success); }
+    .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .empty-description { font-size: 0.88rem; margin-bottom: 1.5rem; }
+
+    .borrow-btn, #borrow-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.5rem; border-radius: var(--radius-md);
+      background: var(--primary); color: white; border: none;
+      font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+    }
+    .borrow-btn:hover, #borrow-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+  </style>
 </head>
-
 <body>
-    <!-- Header Section -->
-    <header class="header">
-        <div class="header-content">
-            <h1 class="page-title">
-                <svg class="title-icon" viewBox="0 0 24 24">
-                    <path
-                        d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z" />
-                </svg>
-                Return Equipment
-            </h1>
-            <button class="back-btn" id="back-btn">
-                <svg class="back-icon" viewBox="0 0 24 24">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                </svg>
-                Back to Dashboard
-            </button>
+
+  <nav class="navbar">
+    <a href="../dashboard/dashboard.html" class="brand">
+      <div class="brand-icon"><i class="fas fa-boxes"></i></div>
+      <span class="brand-name">Ortho<strong>Stock</strong></span>
+    </a>
+    <button class="back-link" id="back-btn">
+      <i class="fas fa-arrow-left"></i> Tableau de bord
+    </button>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <h1>Retour de <span>matériel</span></h1>
+      <p>Gérez le retour des pièces empruntées</p>
+    </div>
+
+    <div class="return-card">
+      <div class="return-card-header">
+        <div class="return-card-icon"><i class="fas fa-undo-alt"></i></div>
+        <div>
+          <h2>Articles empruntés</h2>
+          <p>Consultez et retournez les équipements empruntés</p>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="return-container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <svg class="section-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                    </svg>
-                    Your Borrowed Items
-                </h2>
-                <p class="section-subtitle">Review and return your borrowed equipment</p>
-            </div>
-
-            <div class="items-list" id="return-items-container">
-                <!-- Loading state -->
-                <div class="loading" id="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p class="loading-text">Loading your borrowed items...</p>
-                </div>
-            </div>
+      </div>
+      <div class="return-card-body">
+        <div class="items-list" id="return-items-container">
+          <div class="loading" id="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Chargement des articles empruntés...</p>
+          </div>
         </div>
 
-        <!-- Empty state (hidden by default) -->
         <div class="empty-state" id="empty-state" style="display: none;">
-            <svg class="empty-icon" viewBox="0 0 24 24">
-                <path
-                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-            </svg>
-            <h3 class="empty-title">No Items to Return</h3>
-            <p class="empty-description">You don't have any items to return at the moment. Ready to borrow some
-                equipment?</p>
-            <button class="borrow-btn" id="borrow-btn">
-                <svg class="borrow-icon" viewBox="0 0 24 24">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                </svg>
-                Borrow Items
-            </button>
+          <i class="fas fa-check-circle"></i>
+          <h3 class="empty-title">Aucun article à retourner</h3>
+          <p class="empty-description">Vous n'avez aucun article à retourner pour le moment.</p>
+          <button class="borrow-btn" id="borrow-btn">
+            <i class="fas fa-hand-holding"></i> Emprunter du matériel
+          </button>
         </div>
-    </main>
+      </div>
+    </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="../config/api-config.js"></script>
-    <script src="../config/app-config.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="returning.js"></script>
+  <script src="../config/api-config.js"></script>
+  <script src="../config/app-config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="returning.js"></script>
 </body>
-
 </html>
