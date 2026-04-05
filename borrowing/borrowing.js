@@ -1,4 +1,4 @@
-
+﻿
 class BorrowingManager {
     constructor() {
         this.currentStudent = null;
@@ -128,6 +128,14 @@ class BorrowingManager {
         });
     }
 
+    getFullImageUrl(imageUrl) {
+        if (!imageUrl) return '';
+        if (imageUrl.startsWith('http')) return imageUrl;
+        if (!imageUrl.startsWith('/')) imageUrl = '/' + imageUrl;
+        const baseUrl = typeof API_CONFIG !== 'undefined' ? API_CONFIG.BASE_URL : window.location.origin;
+        return baseUrl + imageUrl;
+    }
+
     createItemCard(piece) {
         const card = document.createElement('div');
         card.className = 'item-card';
@@ -139,10 +147,12 @@ class BorrowingManager {
         const stockText = piece.currentStock <= 0 ? 'Out of Stock' :
             `${piece.currentStock} available`;
 
+        const imgUrl = this.getFullImageUrl(piece.imageUrl);
+
         card.innerHTML = `
                     <div class="item-image">
-                        ${piece.imageUrl ?
-                `<img src="${piece.imageUrl}" alt="${piece.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        ${imgUrl ?
+                `<img src="${imgUrl}" alt="${piece.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <i class="material-icons" style="display: none;">inventory_2</i>` :
                 `<i class="material-icons">inventory_2</i>`
             }
@@ -373,10 +383,11 @@ class BorrowingManager {
     setupBorrowModal(piece) {
         // Setup modal item details
         const modalDetails = document.getElementById('modal-item-details');
+        const modalImgUrl = this.getFullImageUrl(piece.imageUrl);
         modalDetails.innerHTML = `
                     <div class="modal-item-image">
-                        ${piece.imageUrl ?
-                `<img src="${piece.imageUrl}" alt="${piece.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        ${modalImgUrl ?
+                `<img src="${modalImgUrl}" alt="${piece.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <i class="material-icons" style="display: none;">inventory_2</i>` :
                 `<i class="material-icons">inventory_2</i>`
             }
@@ -539,3 +550,5 @@ let borrowingManager;
 document.addEventListener('DOMContentLoaded', () => {
     borrowingManager = new BorrowingManager();
 });
+
+
