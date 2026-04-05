@@ -1,4 +1,4 @@
-
+﻿
 // Authentication Manager Class
 class AuthenticationManager {
     constructor() {
@@ -111,9 +111,17 @@ class AuthenticationManager {
             config,
             (decodedText) => this.onScanSuccess(decodedText),
             (error) => this.onScanFailure(error)
-        ).catch(error => {
-            console.error("Error starting scanner:", error);
-            this.showScannerError('Could not access camera. Please ensure camera permissions are granted.');
+        ).catch(() => {
+            // Rear camera not available (e.g. PC) — fall back to any camera
+            this.scanner.start(
+                { facingMode: "user" },
+                config,
+                (decodedText) => this.onScanSuccess(decodedText),
+                (error) => this.onScanFailure(error)
+            ).catch(err2 => {
+                console.error("Error starting scanner:", err2);
+                this.showScannerError('Could not access camera. Please ensure camera permissions are granted.');
+            });
         });
     }
 
@@ -230,3 +238,4 @@ class AuthenticationManager {
 document.addEventListener('DOMContentLoaded', () => {
     new AuthenticationManager();
 });
+
