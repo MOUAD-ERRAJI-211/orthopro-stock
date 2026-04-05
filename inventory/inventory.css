@@ -879,3 +879,28 @@ body {
 
 
 
+
+/* ===== NOTIFICATION PANEL REDESIGN ===== */
+.notification-panel { position: fixed !important; top: 60px !important; right: 0 !important; width: 360px !important; height: calc(100vh - 60px) !important; background: #f8fafc !important; border-left: 1px solid #e2e8f0 !important; box-shadow: -8px 0 32px rgba(30,60,114,0.12) !important; transform: translateX(100%) !important; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important; z-index: 500 !important; display: flex !important; flex-direction: column !important; }
+.notification-panel.open { transform: translateX(0) !important; }
+.notification-panel-header { padding: 1.1rem 1.4rem !important; display: flex !important; justify-content: space-between !important; align-items: center !important; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; flex-shrink: 0 !important; border-bottom: none !important; }
+.notification-panel-header h3 { font-size: 0.95rem !important; font-weight: 700 !important; color: #ffffff !important; display: flex !important; align-items: center !important; gap: 0.55rem !important; margin: 0 !important; }
+.notification-panel-header h3 i { color: rgba(255,255,255,0.85) !important; }
+.notification-panel-header .close-btn { width: 30px !important; height: 30px !important; border-radius: 50% !important; border: 1.5px solid rgba(255,255,255,0.35) !important; background: rgba(255,255,255,0.12) !important; color: rgba(255,255,255,0.85) !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.2s ease !important; }
+.notification-panel-header .close-btn:hover { background: rgba(255,255,255,0.25) !important; color: #fff !important; }
+.notification-panel-content { flex: 1 !important; overflow-y: auto !important; padding: 0.9rem !important; display: flex !important; flex-direction: column !important; gap: 0.6rem !important; background: #f8fafc !important; }
+.notification-panel-content::-webkit-scrollbar { width: 5px; }
+.notification-panel-content::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 99px; }
+.notification-item { padding: 0.85rem 1rem !important; border-radius: 10px !important; border: 1px solid #e2e8f0 !important; background: #ffffff !important; cursor: pointer !important; transition: all 0.2s ease !important; display: flex !important; align-items: flex-start !important; gap: 0.75rem !important; box-shadow: 0 1px 4px rgba(30,60,114,0.06) !important; }
+.notification-item:hover { transform: translateX(-3px) !important; box-shadow: 0 4px 14px rgba(30,60,114,0.12) !important; border-color: #c3d0e8 !important; }
+.notification-item.critical { border-left: 4px solid #e53e3e !important; background: linear-gradient(135deg, #fff5f5 0%, #ffffff 60%) !important; }
+.notification-item.warning { border-left: 4px solid #d97706 !important; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 60%) !important; }
+.notif-icon { width: 34px !important; height: 34px !important; border-radius: 8px !important; flex-shrink: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0.95rem !important; }
+.notification-item.critical .notif-icon { background: rgba(229,62,62,0.12) !important; color: #e53e3e !important; }
+.notification-item.warning .notif-icon { background: rgba(217,119,6,0.12) !important; color: #d97706 !important; }
+.notif-body { flex: 1 !important; min-width: 0 !important; }
+.notification-title { font-size: 0.78rem !important; font-weight: 700 !important; margin-bottom: 0.25rem !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; }
+.notification-item.critical .notification-title { color: #c53030 !important; }
+.notification-item.warning .notification-title { color: #b45309 !important; }
+.notification-message { font-size: 0.83rem !important; color: #4a5568 !important; line-height: 1.45 !important; font-weight: 500 !important; }
+.no-notifications { text-align: center !important; padding: 3.5rem 1rem !important; color: #a0aec0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 0.75rem !important; }
