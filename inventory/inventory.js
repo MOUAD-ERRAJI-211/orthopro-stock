@@ -481,12 +481,12 @@
                         notification.type === 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle';
             
             item.innerHTML = `
-                <div class="notification-title">
+                <div class="notif-icon">
                     <i class="fas ${icon}"></i>
-                    ${notification.title}
                 </div>
-                <div class="notification-message">
-                    ${notification.message}
+                <div class="notif-body">
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-message">${notification.message}</div>
                 </div>
             `;
             
@@ -1386,4 +1386,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     new InventoryManager();
 });
+
 
