@@ -95,33 +95,21 @@ class AuthenticationManager {
             try { this.scanner.stop(); } catch(e) {}
             this.scanner = null;
         }
-
-        const placeholder = document.getElementById('scanner-placeholder');
-        placeholder.innerHTML = '';
-
+        const placeholder = document.getElementById("scanner-placeholder");
+        placeholder.innerHTML = "";
         this.scanner = new Html5Qrcode("scanner-placeholder");
-
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-        Html5Qrcode.getCameras().then(cameras => {
-            if (!cameras || cameras.length === 0) {
-                this.showScannerError('No camera found on this device.');
-                return;
-            }
-            // Prefer rear camera, fall back to first available
-            const cam = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
+        this.scanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            (text) => this.onScanSuccess(text),
+            (err) => {}
+        ).catch(() => {
             this.scanner.start(
-                cam.id,
-                config,
-                (decodedText) => this.onScanSuccess(decodedText),
-                (error) => this.onScanFailure(error)
-            ).catch(err => {
-                console.error("Scanner start error:", err);
-                this.showScannerError('Could not start camera. Please allow camera access and try again.');
-            });
-        }).catch(err => {
-            console.error("getCameras error:", err);
-            this.showScannerError('Camera access denied. Please allow camera permissions in your browser.');
+                { facingMode: "user" },
+                { fps: 10, qrbox: 250 },
+                (text) => this.onScanSuccess(text),
+                (err) => {}
+            ).catch(e => { placeholder.innerHTML = "<p style=color:red;padding:1rem>Camera error: " + e + "</p>"; });
         });
     }
 
@@ -238,6 +226,7 @@ class AuthenticationManager {
 document.addEventListener('DOMContentLoaded', () => {
     new AuthenticationManager();
 });
+
 
 
 
