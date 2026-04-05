@@ -231,9 +231,16 @@ class BorrowingManager {
             config,
             (decodedText) => this.onScanSuccess(decodedText),
             (error) => this.onScanFailure(error)
-        ).catch(error => {
-            console.error("Error starting scanner:", error);
-            this.showScannerError('Could not access camera. Please ensure camera permissions are granted.');
+        ).catch(() => {
+            this.scanner.start(
+                { facingMode: "user" },
+                config,
+                (decodedText) => this.onScanSuccess(decodedText),
+                (error) => this.onScanFailure(error)
+            ).catch(err2 => {
+                console.error("Error starting scanner:", err2);
+                this.showScannerError('Could not access camera. Please ensure camera permissions are granted.');
+            });
         });
     }
 
@@ -550,5 +557,6 @@ let borrowingManager;
 document.addEventListener('DOMContentLoaded', () => {
     borrowingManager = new BorrowingManager();
 });
+
 
 

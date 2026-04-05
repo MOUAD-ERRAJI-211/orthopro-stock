@@ -610,3 +610,25 @@ body {
         transform: scale(1.02);
     }
 }
+/* ===== QR SCANNER MODAL REDESIGN ===== */
+.qr-modal { display: none; position: fixed; inset: 0; background: rgba(10,20,40,0.7); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+.qr-modal.active { display: flex; animation: fadeIn 0.25s ease; }
+.qr-modal-content { width: 100%; max-width: 460px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 24px 60px rgba(10,20,40,0.25); animation: slideUp 0.3s ease; }
+.qr-modal-header { padding: 1.2rem 1.5rem; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); display: flex; justify-content: space-between; align-items: center; }
+.qr-modal-title { color: #fff; font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.close-modal-btn { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.close-modal-btn:hover { background: rgba(255,255,255,0.28); transform: scale(1.1); }
+.qr-scanner-container { position: relative; width: 100%; height: 340px; background: #0d1b2e; overflow: hidden; }
+.scanner-placeholder { width: 100%; height: 100%; }
+.scanner-placeholder video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+.scanner-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.scanner-frame { width: 210px; height: 210px; border-radius: 16px; position: relative; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); }
+.scanner-frame::before, .scanner-frame::after { content: ''; position: absolute; width: 28px; height: 28px; border: 3px solid #2a9d8f; }
+.scanner-frame::before { top: -2px; left: -2px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
+.scanner-frame::after { bottom: -2px; right: -2px; border-left: none; border-top: none; border-radius: 0 0 6px 0; }
+.scanner-line { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, #2a9d8f, transparent); animation: scanLine 2s ease-in-out infinite; }
+@keyframes scanLine { 0% { top: 0; opacity: 1; } 100% { top: 100%; opacity: 0.3; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.scanner-instructions { padding: 1.1rem 1.5rem; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center; }
+.scanner-instructions p { color: #4a5568; font-size: 0.88rem; font-weight: 500; margin: 0; }
