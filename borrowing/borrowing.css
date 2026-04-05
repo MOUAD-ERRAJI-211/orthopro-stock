@@ -1178,3 +1178,8 @@ body {
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .scanner-instructions { padding: 1.1rem 1.5rem; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center; }
 .scanner-instructions p { color: #4a5568; font-size: 0.88rem; font-weight: 500; margin: 0; }
+
+/* Fix scanner video visibility */
+.scanner-placeholder { position: relative !important; z-index: 1 !important; }
+.scanner-placeholder video { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important; }
+#scanner-placeholder > * { display: block !important; }
