@@ -212,13 +212,22 @@ class BorrowingManager {
 
     initScanner() {
         if (this.scanner) {
-            this.scanner.stop().catch(err => console.error("Error stopping previous scanner:", err));
+            try { this.scanner.stop(); } catch(e) {}
+            this.scanner = null;
         }
 
         const placeholder = document.getElementById('scanner-placeholder');
         placeholder.innerHTML = '';
 
         this.scanner = new Html5Qrcode("scanner-placeholder");
+        const config2 = { fps: 10, qrbox: { width: 250, height: 250 } };
+        Html5Qrcode.getCameras().then(cameras => {
+            if (!cameras || cameras.length === 0) { placeholder.innerHTML = '<p style="color:red;padding:1rem">No camera found.</p>'; return; }
+            const cam = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
+            this.scanner.start(cam.id, config2, (t) => this.onQRScanSuccess(t), () => {}).catch(e => { placeholder.innerHTML = '<p style="color:red;padding:1rem">Camera error: ' + e + '</p>'; });
+        }).catch(e => { placeholder.innerHTML = '<p style="color:red;padding:1rem">Camera access denied.</p>'; });
+        // original config kept below for reference
+        // Use getCameras for PC compatibility — see initScanner override below
 
         const config = {
             fps: 10,
@@ -557,6 +566,8 @@ let borrowingManager;
 document.addEventListener('DOMContentLoaded', () => {
     borrowingManager = new BorrowingManager();
 });
+
+
 
 
 
