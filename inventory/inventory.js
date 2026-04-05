@@ -1,4 +1,4 @@
-class InventoryManager {
+﻿class InventoryManager {
     constructor() {
         this.allPieces = [];
         this.notifications = [];
@@ -449,12 +449,7 @@ class InventoryManager {
         // Update notification badge
         this.notificationBadge.textContent = this.notifications.length;
         
-        // Show toast for critical items only
-        outOfStockItems.slice(0, 3).forEach((piece, index) => {
-            setTimeout(() => {
-                this.showToast('Out of Stock Alert', `${piece.name} is out of stock`, 'error');
-            }, index * 500);
-        });
+        // Auto-toast removed: user opens panel manually
     }
 
     // Notification panel
@@ -1391,3 +1386,4 @@ class InventoryManager {
 document.addEventListener('DOMContentLoaded', () => {
     new InventoryManager();
 });
+
