@@ -91,17 +91,14 @@ class AuthenticationManager {
     }
 
     initScanner() {
-        if (this.scanner) {
-            try { this.scanner.stop(); } catch(e) {}
-            this.scanner = null;
-        }
-        const placeholder = document.getElementById("scanner-placeholder");
-        placeholder.innerHTML = "";
+        if (this.scanner) { try { this.scanner.stop(); } catch(e) {} this.scanner = null; }
+        document.getElementById("scanner-placeholder").innerHTML = "";
         this.scanner = new Html5Qrcode("scanner-placeholder");
-        this.scanner.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            (text) => this.onScanSuccess(text),
+        this.scanner.start({ facingMode: "user" }, { fps: 10, qrbox: 200 }, (t) => this.onScanSuccess(t), () => {})
+            .catch(e => { document.getElementById("scanner-placeholder").innerHTML = "<p style='color:red;padding:1rem'>Error: " + e + "</p>"; });
+    }
+
+    onScanSuccess(text),
             (err) => {}
         ).catch(() => {
             this.scanner.start(
@@ -226,6 +223,7 @@ class AuthenticationManager {
 document.addEventListener('DOMContentLoaded', () => {
     new AuthenticationManager();
 });
+
 
 
 
