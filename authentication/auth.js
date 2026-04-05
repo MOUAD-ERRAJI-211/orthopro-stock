@@ -1,4 +1,4 @@
-
+﻿
 // Authentication Manager Class
 class AuthenticationManager {
     constructor() {
@@ -67,7 +67,7 @@ class AuthenticationManager {
 
     openQRModal() {
         this.modal.classList.add('active');
-        setTimeout(() => this.initScanner(), 300);
+        setTimeout(() => this.initScanner(), 800);
     }
 
     closeQRModal() {
@@ -200,3 +200,4 @@ class AuthenticationManager {
 document.addEventListener('DOMContentLoaded', () => {
     new AuthenticationManager();
 });
+
