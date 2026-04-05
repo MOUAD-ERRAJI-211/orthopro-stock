@@ -316,6 +316,27 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes toastSlideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes toastSlideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
+    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.6rem; min-width: 300px; max-width: 360px; }
+    .toast { display: flex; align-items: center; gap: 0.85rem; padding: 0.9rem 1.1rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.13); animation: toastSlideIn 0.35s cubic-bezier(0.4,0,0.2,1); background: #fff; border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
+    .toast::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; }
+    .toast.success::before { background: linear-gradient(180deg, #38a169, #68d391); }
+    .toast.error::before { background: linear-gradient(180deg, #e53e3e, #fc8181); }
+    .toast.warning::before { background: linear-gradient(180deg, #d97706, #f6ad55); }
+    .toast.info::before { background: linear-gradient(180deg, #3182ce, #63b3ed); }
+    .toast-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
+    .toast.success .toast-icon { background: rgba(56,161,105,0.12); color: #38a169; }
+    .toast.error .toast-icon { background: rgba(229,62,62,0.12); color: #e53e3e; }
+    .toast.warning .toast-icon { background: rgba(217,119,6,0.12); color: #d97706; }
+    .toast.info .toast-icon { background: rgba(49,130,206,0.12); color: #3182ce; }
+    .toast-content { flex: 1; min-width: 0; }
+    .toast-title { font-size: 0.85rem; font-weight: 700; color: #1a202c; margin-bottom: 0.15rem; }
+    .toast.success .toast-title { color: #276749; }
+    .toast.error .toast-title { color: #9b2c2c; }
+    .toast.warning .toast-title { color: #92400e; }
+    .toast.info .toast-title { color: #2c5282; }
+    .toast-message { font-size: 0.8rem; color: #718096; line-height: 1.4; }
 
     @media (max-width: 1024px) {
       .item-details-grid { grid-template-columns: 1fr; }
@@ -457,17 +478,7 @@
             </div>
           </div>
           <div>
-            <div style="margin-bottom: 1.5rem;">
-              <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">Statistiques d'utilisation</h3>
-              <div class="stats-tabs">
-                <button class="tab-btn active" data-tab="monthly">Mensuel</button>
-                <button class="tab-btn" data-tab="daily">Journalier</button>
-              </div>
-              <div id="monthly-tab"><div id="monthly-transactions" class="monthly-transactions"></div></div>
-              <div id="daily-tab" style="display: none;"><div id="daily-transactions"><p style="font-size: 0.85rem; color: var(--text-muted);">Sélectionnez un mois et un jour</p></div></div>
-            </div>
-            <div>
-              <h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">Seuils de stock</h3>
+            <div><<h3 style="font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem;">Seuils de stock</h3>
               <div class="form-group">
                 <label>Seuil minimum:</label>
                 <input type="number" id="min-threshold" min="0" class="threshold-input">
@@ -585,6 +596,9 @@
   <script src="inventory.js"></script>
 </body>
 </html>
+
+
+
 
 
 
